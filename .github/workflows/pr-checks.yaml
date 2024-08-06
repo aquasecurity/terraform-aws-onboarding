@@ -1,0 +1,87 @@
+name: PR Checks
+
+on:
+  pull_request:
+
+jobs:
+  pr-checks:
+    name: Terraform Validation
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ vars.TERRAFORM_VERSION }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v1
+        with:
+          tflint_version: ${{ vars.TFLINT_VERSION }}
+
+      - name: Run TFLint
+        id: tflint
+        run: tflint --config .tflint.hcl -f compact
+        continue-on-error: true
+
+      - name: Run tests for each example folder
+        id: terraform-checks
+        run: |
+          TEST_CASES=(
+            examples/single-account
+          )
+
+          format_check=true
+          init_check=true
+          validate_check=true
+
+          for tcase in ${TEST_CASES[@]}; do
+            echo "--> Running tests at $tcase"
+            (
+              cd $tcase || exit 1
+              echo "Replacing <REPLACE_ME> placeholders"
+              if [[ "$OSTYPE" == "darwin"* ]]; then
+                sed -i '' 's/<REPLACE_ME>/dummy_value/g' *.tf
+              else
+                sed -i 's/<REPLACE_ME>/dummy_value/g' *.tf
+              fi
+              echo "Terraform Format Check"
+              terraform fmt -check || format_check=false
+              echo "Terraform Init"
+              terraform init || init_check=false
+              echo "Terraform Validate"
+              terraform validate || validate_check=false
+            ) || exit 1
+          done
+
+          echo "format_check=$format_check" >> $GITHUB_OUTPUT
+          echo "init_check=$init_check" >> $GITHUB_OUTPUT
+          echo "validate_check=$validate_check" >> $GITHUB_OUTPUT
+
+      - name: Comment PR with Terraform status
+        uses: actions/github-script@v7
+        env:
+          FORMAT_CHECK: ${{ steps.terraform-checks.outputs.format_check == 'true' && '✅' || '❌' }}
+          INIT_CHECK: ${{ steps.terraform-checks.outputs.init_check == 'true' && '✅' || '❌' }}
+          VALIDATE_CHECK: ${{ steps.terraform-checks.outputs.validate_check == 'true' && '✅' || '❌' }}
+          TFLINT_CHECK: ${{ steps.tflint.outcome == 'success' && '✅' || '❌' }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Validation Results:
+
+            Terraform Format Check ${{ env.FORMAT_CHECK }}
+            Terraform Init ${{ env.INIT_CHECK }}
+            Terraform Validate ${{ env.VALIDATE_CHECK }}
+            TFLint Check ${{ env.TFLINT_CHECK }}
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })

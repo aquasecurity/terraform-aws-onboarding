@@ -1,49 +1,8 @@
-![Aquasecurity logo](https://avatars3.githubusercontent.com/u/12783832?s=200&v=4)
-
-# Terraform-aws-onboarding
-
-![Trivy](https://github.com/aquasecurity/terraform-aws-onboarding/actions/workflows/trivy-scan.yaml/badge.svg)
-[![Release](https://img.shields.io/github/v/release/aquasecurity/terraform-aws-onboarding)](https://github.com/aquasecurity/terraform-aws-onboarding/releases)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-
-This Terraform module provides an easy way
-to configure Aqua Security’s CSPM and agentless solutions on Amazon Web Services (AWS).
-
-It creates the necessary resources, such as lambda functions, roles, and permissions,
-to enable seamless integration with Aqua’s platform.
+# `single` module
 
 ---
 
-## Table of Contents
-
-- [Pre-requisites](#Pre-requisites)
-- [Usage](#usage)
-- [Examples](#examples)
-
-## Pre-requisites
-
-Before using this module, ensure that you have the following:
-
-- Terraform version `1.6.4` or later.
-- `aws` CLI installed and configured.
-- `Python` 3+ installed.
-- Aqua Security account API credentials.
-
-## Usage
-1. Leverage the Aqua platform to generate the local variables required by the module.
-2. Important: Replace `aqua_api_key` and `aqua_api_secret` with your generated API credentials.
-3. Login using the AWS CLI on the account you want to onboard.
-4. Run `terraform init` to initialize the module.
-5. Run `terraform apply` to create the resources.
-
-**Notes:**
-- Ensure that the provided regions are enabled in your AWS account. If the provided regions are not enabled, they will be skipped they will be skipped even if they had been defined within Aqua's scan settings during onboarding.
-- If you change parameters after initial deployment, we recommend running `terraform destroy` before applying the changes again to avoid certain Lambda errors.
-
-
-## Examples
-
-* [Single account with multiple regions](https://github.com/aquasecurity/terraform-aws-onboarding/examples/single-account)
+This Terraform module provisions the essential AWS infrastructure and configurations to deploy and integrate Aqua Security.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -51,37 +10,38 @@ Before using this module, ensure that you have the following:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6.4 |
-| <a name="requirement_archive"></a> [archive](#requirement\_archive) | ~> 2.4.2 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.57.0 |
-| <a name="requirement_external"></a> [external](#requirement\_external) | ~> 2.3.3 |
-| <a name="requirement_http"></a> [http](#requirement\_http) | ~> 3.4.3 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.6.2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.6.2 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5.57.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_single"></a> [single](#module\_single) | ./modules/single | n/a |
+| <a name="module_kinesis"></a> [kinesis](#module\_kinesis) | ./modules/kinesis | n/a |
+| <a name="module_lambda"></a> [lambda](#module\_lambda) | ./modules/lambda | n/a |
+| <a name="module_stackset"></a> [stackset](#module\_stackset) | ./modules/stackset | n/a |
+| <a name="module_trigger"></a> [trigger](#module\_trigger) | ./modules/trigger | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [random_string.id](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
+| [aws_regions.enabled](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/regions) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_additional_tags"></a> [additional\_tags](#input\_additional\_tags) | Additional tags to be sent to the Autoconnect API | `map(string)` | `{}` | no |
-| <a name="input_aqua_api_key"></a> [aqua\_api\_key](#input\_aqua\_api\_key) | Aqua API Key | `string` | n/a | yes |
-| <a name="input_aqua_api_secret"></a> [aqua\_api\_secret](#input\_aqua\_api\_secret) | Aqua API Secret | `string` | n/a | yes |
+| <a name="input_additional_tags"></a> [additional\_tags](#input\_additional\_tags) | Additional resource tags to will be send to the Autoconnect API | `map(string)` | n/a | yes |
+| <a name="input_aqua_api_key"></a> [aqua\_api\_key](#input\_aqua\_api\_key) | Aqua API key | `string` | n/a | yes |
+| <a name="input_aqua_api_secret"></a> [aqua\_api\_secret](#input\_aqua\_api\_secret) | Aqua API secret | `string` | n/a | yes |
 | <a name="input_aqua_autoconnect_url"></a> [aqua\_autoconnect\_url](#input\_aqua\_autoconnect\_url) | Aqua Autoconnect API URL | `string` | n/a | yes |
 | <a name="input_aqua_bucket_name"></a> [aqua\_bucket\_name](#input\_aqua\_bucket\_name) | Aqua Bucket Name | `string` | n/a | yes |
 | <a name="input_aqua_cspm_aws_account_id"></a> [aqua\_cspm\_aws\_account\_id](#input\_aqua\_cspm\_aws\_account\_id) | Aqua CSPM AWS Account ID | `string` | n/a | yes |
@@ -94,22 +54,21 @@ Before using this module, ensure that you have the following:
 | <a name="input_aqua_volscan_api_url"></a> [aqua\_volscan\_api\_url](#input\_aqua\_volscan\_api\_url) | Aqua Volume Scanning API URL | `string` | n/a | yes |
 | <a name="input_aqua_volscan_aws_account_id"></a> [aqua\_volscan\_aws\_account\_id](#input\_aqua\_volscan\_aws\_account\_id) | Aqua Volume Scanning AWS Account ID | `string` | n/a | yes |
 | <a name="input_aqua_worker_role_arn"></a> [aqua\_worker\_role\_arn](#input\_aqua\_worker\_role\_arn) | Aqua Worker Role ARN | `string` | n/a | yes |
-| <a name="input_create_vpcs"></a> [create\_vpcs](#input\_create\_vpcs) | Toggle to create VPCs | `bool` | `true` | no |
-| <a name="input_custom_agentless_role_name"></a> [custom\_agentless\_role\_name](#input\_custom\_agentless\_role\_name) | Custom Agentless role Name | `string` | `""` | no |
-| <a name="input_custom_bucket_name"></a> [custom\_bucket\_name](#input\_custom\_bucket\_name) | Custom bucket Name | `string` | `""` | no |
-| <a name="input_custom_cspm_role_name"></a> [custom\_cspm\_role\_name](#input\_custom\_cspm\_role\_name) | Custom CSPM role Name | `string` | `""` | no |
-| <a name="input_custom_internet_gateway_name"></a> [custom\_internet\_gateway\_name](#input\_custom\_internet\_gateway\_name) | Custom Internet Gateway Name | `string` | `""` | no |
-| <a name="input_custom_processor_lambda_role_name"></a> [custom\_processor\_lambda\_role\_name](#input\_custom\_processor\_lambda\_role\_name) | Custom Processor lambda role Name | `string` | `""` | no |
-| <a name="input_custom_security_group_name"></a> [custom\_security\_group\_name](#input\_custom\_security\_group\_name) | Custom Security Group Name | `string` | `""` | no |
-| <a name="input_custom_vpc_name"></a> [custom\_vpc\_name](#input\_custom\_vpc\_name) | Custom VPC Name | `string` | `""` | no |
-| <a name="input_custom_vpc_subnet1_name"></a> [custom\_vpc\_subnet1\_name](#input\_custom\_vpc\_subnet1\_name) | Custom VPC Subnet 1 Name | `string` | `""` | no |
-| <a name="input_custom_vpc_subnet2_name"></a> [custom\_vpc\_subnet2\_name](#input\_custom\_vpc\_subnet2\_name) | Custom VPC Subnet 2 Name | `string` | `""` | no |
-| <a name="input_custom_vpc_subnet_route_table1_name"></a> [custom\_vpc\_subnet\_route\_table1\_name](#input\_custom\_vpc\_subnet\_route\_table1\_name) | Custom VPC Route Table 1 Name | `string` | `""` | no |
-| <a name="input_custom_vpc_subnet_route_table2_name"></a> [custom\_vpc\_subnet\_route\_table2\_name](#input\_custom\_vpc\_subnet\_route\_table2\_name) | Custom VPC Route Table 2 Name | `string` | `""` | no |
+| <a name="input_create_vpcs"></a> [create\_vpcs](#input\_create\_vpcs) | Toggle to create VPCs | `bool` | n/a | yes |
+| <a name="input_custom_agentless_role_name"></a> [custom\_agentless\_role\_name](#input\_custom\_agentless\_role\_name) | Custom Agentless role Name | `string` | n/a | yes |
+| <a name="input_custom_bucket_name"></a> [custom\_bucket\_name](#input\_custom\_bucket\_name) | Custom bucket Name | `string` | n/a | yes |
+| <a name="input_custom_cspm_role_name"></a> [custom\_cspm\_role\_name](#input\_custom\_cspm\_role\_name) | Custom CSPM role Name | `string` | n/a | yes |
+| <a name="input_custom_internet_gateway_name"></a> [custom\_internet\_gateway\_name](#input\_custom\_internet\_gateway\_name) | Custom Internet Gateway Name | `string` | n/a | yes |
+| <a name="input_custom_processor_lambda_role_name"></a> [custom\_processor\_lambda\_role\_name](#input\_custom\_processor\_lambda\_role\_name) | Custom Processor lambda role Name | `string` | n/a | yes |
+| <a name="input_custom_security_group_name"></a> [custom\_security\_group\_name](#input\_custom\_security\_group\_name) | Custom Security Group Name | `string` | n/a | yes |
+| <a name="input_custom_vpc_name"></a> [custom\_vpc\_name](#input\_custom\_vpc\_name) | Custom VPC Name | `string` | n/a | yes |
+| <a name="input_custom_vpc_subnet1_name"></a> [custom\_vpc\_subnet1\_name](#input\_custom\_vpc\_subnet1\_name) | Custom VPC Subnet 1 Name | `string` | n/a | yes |
+| <a name="input_custom_vpc_subnet2_name"></a> [custom\_vpc\_subnet2\_name](#input\_custom\_vpc\_subnet2\_name) | Custom VPC Subnet 2 Name | `string` | n/a | yes |
+| <a name="input_custom_vpc_subnet_route_table1_name"></a> [custom\_vpc\_subnet\_route\_table1\_name](#input\_custom\_vpc\_subnet\_route\_table1\_name) | Custom VPC Route Table 1 Name | `string` | n/a | yes |
+| <a name="input_custom_vpc_subnet_route_table2_name"></a> [custom\_vpc\_subnet\_route\_table2\_name](#input\_custom\_vpc\_subnet\_route\_table2\_name) | Custom VPC Route Table 2 Name | `string` | n/a | yes |
+| <a name="input_random_id"></a> [random\_id](#input\_random\_id) | Random ID to apply to resource names | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Main AWS Region to to deploy resources | `string` | n/a | yes |
 | <a name="input_regions"></a> [regions](#input\_regions) | AWS Regions to deploy discovery and scanning resources | `list(string)` | n/a | yes |
-| <a name="input_show_outputs"></a> [show\_outputs](#input\_show\_outputs) | Whether to show outputs after deployment | `bool` | `false` | no |
-| <a name="input_type"></a> [type](#input\_type) | The type of onboarding. Currently only 'single' onboarding types are supported | `string` | n/a | yes |
 
 ## Outputs
 
@@ -131,8 +90,6 @@ Before using this module, ensure that you have the following:
 | <a name="output_kinesis_stream_arn"></a> [kinesis\_stream\_arn](#output\_kinesis\_stream\_arn) | Kinesis Stream ARN |
 | <a name="output_kinesis_stream_events_role_arn"></a> [kinesis\_stream\_events\_role\_arn](#output\_kinesis\_stream\_events\_role\_arn) | Kinesis Stream Events Role ARN |
 | <a name="output_onboarding_status"></a> [onboarding\_status](#output\_onboarding\_status) | Onboarding API Status Result |
-| <a name="output_region"></a> [region](#output\_region) | AWS Region to to deploy discovery resources |
-| <a name="output_regions"></a> [regions](#output\_regions) | AWS Regions to to deploy scanning resources |
 | <a name="output_stack_set_admin_role_arn"></a> [stack\_set\_admin\_role\_arn](#output\_stack\_set\_admin\_role\_arn) | ARN of the StackSet admin role |
 | <a name="output_stack_set_admin_role_name"></a> [stack\_set\_admin\_role\_name](#output\_stack\_set\_admin\_role\_name) | Name of the StackSet admin role |
 | <a name="output_stack_set_execution_role_arn"></a> [stack\_set\_execution\_role\_arn](#output\_stack\_set\_execution\_role\_arn) | ARN of the StackSet execution role |
