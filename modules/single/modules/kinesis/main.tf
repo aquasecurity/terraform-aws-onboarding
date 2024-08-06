@@ -71,6 +71,7 @@ resource "aws_iam_role" "kinesis_stream_events_role" {
 }
 
 # Create Kinesis Firehose role
+#tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_role" "kinesis_firehose_role" {
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",

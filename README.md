@@ -32,7 +32,7 @@ Before using this module, ensure that you have the following:
 ## Usage
 1. Leverage the Aqua platform to generate the local variables required by the module.
 2. Important: Replace `aqua_api_key` and `aqua_api_secret` with your generated API credentials.
-3. Login using the AWS CLI on the account you want to onboard.
+3. Log in using the AWS CLI on the account you want to onboard. If you are running organization onboarding, ensure you log in using the management account.
 4. Run `terraform init` to initialize the module.
 5. Run `terraform apply` to create the resources.
 
@@ -43,7 +43,9 @@ Before using this module, ensure that you have the following:
 
 ## Examples
 
-* [Single account with multiple regions](https://github.com/aquasecurity/terraform-aws-onboarding/examples/single-account)
+* [Single account with multiple regions](https://github.com/aquasecurity/terraform-aws-onboarding/tree/main/examples/single-account)
+* [Organization with multiple regions](https://github.com/aquasecurity/terraform-aws-onboarding/tree/main/examples/organization)
+
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -67,6 +69,7 @@ Before using this module, ensure that you have the following:
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_organization"></a> [organization](#module\_organization) | ./modules/organization | n/a |
 | <a name="module_single"></a> [single](#module\_single) | ./modules/single | n/a |
 
 ## Resources
@@ -82,14 +85,17 @@ Before using this module, ensure that you have the following:
 | <a name="input_additional_tags"></a> [additional\_tags](#input\_additional\_tags) | Additional tags to be sent to the Autoconnect API | `map(string)` | `{}` | no |
 | <a name="input_aqua_api_key"></a> [aqua\_api\_key](#input\_aqua\_api\_key) | Aqua API Key | `string` | n/a | yes |
 | <a name="input_aqua_api_secret"></a> [aqua\_api\_secret](#input\_aqua\_api\_secret) | Aqua API Secret | `string` | n/a | yes |
-| <a name="input_aqua_autoconnect_url"></a> [aqua\_autoconnect\_url](#input\_aqua\_autoconnect\_url) | Aqua Autoconnect API URL | `string` | n/a | yes |
+| <a name="input_aqua_autoconnect_url"></a> [aqua\_autoconnect\_url](#input\_aqua\_autoconnect\_url) | Aqua Autoconnect API URL (This should be provided only if type of onboarding is 'single') | `string` | `""` | no |
 | <a name="input_aqua_bucket_name"></a> [aqua\_bucket\_name](#input\_aqua\_bucket\_name) | Aqua Bucket Name | `string` | n/a | yes |
 | <a name="input_aqua_cspm_aws_account_id"></a> [aqua\_cspm\_aws\_account\_id](#input\_aqua\_cspm\_aws\_account\_id) | Aqua CSPM AWS Account ID | `string` | n/a | yes |
 | <a name="input_aqua_cspm_group_id"></a> [aqua\_cspm\_group\_id](#input\_aqua\_cspm\_group\_id) | Aqua CSPM Group ID | `number` | n/a | yes |
 | <a name="input_aqua_cspm_ipv4_address"></a> [aqua\_cspm\_ipv4\_address](#input\_aqua\_cspm\_ipv4\_address) | Aqua CSPM IPv4 address | `string` | n/a | yes |
 | <a name="input_aqua_cspm_role_prefix"></a> [aqua\_cspm\_role\_prefix](#input\_aqua\_cspm\_role\_prefix) | Aqua CSPM role name prefix | `string` | n/a | yes |
 | <a name="input_aqua_cspm_url"></a> [aqua\_cspm\_url](#input\_aqua\_cspm\_url) | Aqua CSPM API URL | `string` | n/a | yes |
+| <a name="input_aqua_group_name"></a> [aqua\_group\_name](#input\_aqua\_group\_name) | Aqua Group Name (This should be provided only if type of onboarding is 'organization') | `string` | `""` | no |
+| <a name="input_aqua_random_id"></a> [aqua\_random\_id](#input\_aqua\_random\_id) | Aqua Random ID (This should be provided only if type of onboarding is 'organization') | `string` | `""` | no |
 | <a name="input_aqua_session_id"></a> [aqua\_session\_id](#input\_aqua\_session\_id) | Aqua Session ID | `string` | n/a | yes |
+| <a name="input_aqua_tenant_id"></a> [aqua\_tenant\_id](#input\_aqua\_tenant\_id) | Aqua Tenant ID (This should be provided only if type of onboarding is 'organization') | `string` | `""` | no |
 | <a name="input_aqua_volscan_api_token"></a> [aqua\_volscan\_api\_token](#input\_aqua\_volscan\_api\_token) | Aqua Volume Scanning API Token | `string` | n/a | yes |
 | <a name="input_aqua_volscan_api_url"></a> [aqua\_volscan\_api\_url](#input\_aqua\_volscan\_api\_url) | Aqua Volume Scanning API URL | `string` | n/a | yes |
 | <a name="input_aqua_volscan_aws_account_id"></a> [aqua\_volscan\_aws\_account\_id](#input\_aqua\_volscan\_aws\_account\_id) | Aqua Volume Scanning AWS Account ID | `string` | n/a | yes |
@@ -106,10 +112,11 @@ Before using this module, ensure that you have the following:
 | <a name="input_custom_vpc_subnet2_name"></a> [custom\_vpc\_subnet2\_name](#input\_custom\_vpc\_subnet2\_name) | Custom VPC Subnet 2 Name | `string` | `""` | no |
 | <a name="input_custom_vpc_subnet_route_table1_name"></a> [custom\_vpc\_subnet\_route\_table1\_name](#input\_custom\_vpc\_subnet\_route\_table1\_name) | Custom VPC Route Table 1 Name | `string` | `""` | no |
 | <a name="input_custom_vpc_subnet_route_table2_name"></a> [custom\_vpc\_subnet\_route\_table2\_name](#input\_custom\_vpc\_subnet\_route\_table2\_name) | Custom VPC Route Table 2 Name | `string` | `""` | no |
-| <a name="input_region"></a> [region](#input\_region) | Main AWS Region to to deploy resources | `string` | n/a | yes |
+| <a name="input_organizational_unit_id"></a> [organizational\_unit\_id](#input\_organizational\_unit\_id) | AWS Organizational unit (OU) ID to deploy resources on (This should be provided only if type of onboarding is 'organization') | `string` | `""` | no |
+| <a name="input_region"></a> [region](#input\_region) | Main AWS Region to deploy resources | `string` | n/a | yes |
 | <a name="input_regions"></a> [regions](#input\_regions) | AWS Regions to deploy discovery and scanning resources | `list(string)` | n/a | yes |
 | <a name="input_show_outputs"></a> [show\_outputs](#input\_show\_outputs) | Whether to show outputs after deployment | `bool` | `false` | no |
-| <a name="input_type"></a> [type](#input\_type) | The type of onboarding. Currently only 'single' onboarding types are supported | `string` | n/a | yes |
+| <a name="input_type"></a> [type](#input\_type) | The type of onboarding. Valid values are 'single' or 'organization' onboarding types | `string` | n/a | yes |
 
 ## Outputs
 
@@ -131,6 +138,8 @@ Before using this module, ensure that you have the following:
 | <a name="output_kinesis_stream_arn"></a> [kinesis\_stream\_arn](#output\_kinesis\_stream\_arn) | Kinesis Stream ARN |
 | <a name="output_kinesis_stream_events_role_arn"></a> [kinesis\_stream\_events\_role\_arn](#output\_kinesis\_stream\_events\_role\_arn) | Kinesis Stream Events Role ARN |
 | <a name="output_onboarding_status"></a> [onboarding\_status](#output\_onboarding\_status) | Onboarding API Status Result |
+| <a name="output_organization_stack_set_name"></a> [organization\_stack\_set\_name](#output\_organization\_stack\_set\_name) | Name of the Organization CloudFormation StackSet |
+| <a name="output_organization_stack_set_template_url"></a> [organization\_stack\_set\_template\_url](#output\_organization\_stack\_set\_template\_url) | URL of the Organization CloudFormation template used by the StackSet |
 | <a name="output_region"></a> [region](#output\_region) | AWS Region to to deploy discovery resources |
 | <a name="output_regions"></a> [regions](#output\_regions) | AWS Regions to to deploy scanning resources |
 | <a name="output_stack_set_admin_role_arn"></a> [stack\_set\_admin\_role\_arn](#output\_stack\_set\_admin\_role\_arn) | ARN of the StackSet admin role |

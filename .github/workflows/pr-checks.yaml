@@ -5,7 +5,7 @@ on:
 
 jobs:
   pr-checks:
-    name: Terraform Validation
+    name: Terraform Tests
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
@@ -60,12 +60,26 @@ jobs:
           echo "init_check=$init_check" >> $GITHUB_OUTPUT
           echo "validate_check=$validate_check" >> $GITHUB_OUTPUT
 
+      - name: Run Terraform test
+        id: terraform-test
+        run: |
+          echo "Terraform Test"
+          terraform init
+          if terraform test -var-file tests/test.tfvars; then
+            echo "test_check=true" >> $GITHUB_OUTPUT
+          else
+            echo "test_check=false" >> $GITHUB_OUTPUT
+            echo "Terraform test failed, but continuing to comment on PR"
+          fi
+
       - name: Comment PR with Terraform status
+        if: always()
         uses: actions/github-script@v7
         env:
           FORMAT_CHECK: ${{ steps.terraform-checks.outputs.format_check == 'true' && '✅' || '❌' }}
           INIT_CHECK: ${{ steps.terraform-checks.outputs.init_check == 'true' && '✅' || '❌' }}
           VALIDATE_CHECK: ${{ steps.terraform-checks.outputs.validate_check == 'true' && '✅' || '❌' }}
+          TEST_CHECK: ${{ steps.terraform-test.outputs.test_check == 'true' && '✅' || '❌' }}
           TFLINT_CHECK: ${{ steps.tflint.outcome == 'success' && '✅' || '❌' }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -75,6 +89,7 @@ jobs:
             Terraform Format Check ${{ env.FORMAT_CHECK }}
             Terraform Init ${{ env.INIT_CHECK }}
             Terraform Validate ${{ env.VALIDATE_CHECK }}
+            Terraform Test ${{ env.TEST_CHECK }}
             TFLint Check ${{ env.TFLINT_CHECK }}
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
@@ -85,3 +100,15 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
+
+      - name: Fail if any checks failed
+        if: always()
+        run: |
+          if [[ "${{ steps.terraform-checks.outputs.format_check }}" != "true" || \
+                "${{ steps.terraform-checks.outputs.init_check }}" != "true" || \
+                "${{ steps.terraform-checks.outputs.validate_check }}" != "true" || \
+                "${{ steps.terraform-test.outputs.test_check }}" != "true" || \
+                "${{ steps.tflint.outcome }}" != "success" ]]; then
+            echo "One or more Terraform checks failed"
+            exit 1
+          fi
