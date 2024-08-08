@@ -10,7 +10,7 @@ This example demonstrates how to onboard an AWS account by provisioning the nece
 
 Before running this example, ensure that you have the following:
 
-1. Terraform installed (version `1.6.4` or later).
+1. Terraform installed (version `1.9.0` or later).
 2. AWS CLI installed and configured.
 3. Aqua Security account API credentials.
 

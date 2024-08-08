@@ -24,7 +24,7 @@ to enable seamless integration with Aqua’s platform.
 
 Before using this module, ensure that you have the following:
 
-- Terraform version `1.6.4` or later.
+- Terraform version `1.9.0` or later.
 - `aws` CLI installed and configured.
 - `Python` 3+ installed.
 - Aqua Security account API credentials.
@@ -52,7 +52,7 @@ Before using this module, ensure that you have the following:
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6.4 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
 | <a name="requirement_archive"></a> [archive](#requirement\_archive) | ~> 2.4.2 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.57.0 |
 | <a name="requirement_external"></a> [external](#requirement\_external) | ~> 2.3.3 |
