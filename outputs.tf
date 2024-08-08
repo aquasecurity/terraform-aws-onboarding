@@ -11,6 +11,8 @@ output "regions" {
   value       = var.show_outputs ? var.regions : null
 }
 
+# Single module outputs
+
 # Kinesis module outputs
 output "cloudwatch_event_bus_arn" {
   description = "Cloudwatch Event Bus ARN"
@@ -128,4 +130,15 @@ output "stack_set_template_url" {
 output "onboarding_status" {
   description = "Onboarding API Status Result"
   value       = var.type == "single" ? module.single[0].onboarding_status : null
+}
+
+# Organization module outputs
+output "organization_stack_set_name" {
+  description = "Name of the Organization CloudFormation StackSet"
+  value       = var.show_outputs && var.type == "organization" ? module.organization[0].stack_set_name : null
+}
+
+output "organization_stack_set_template_url" {
+  description = "URL of the Organization CloudFormation template used by the StackSet"
+  value       = var.show_outputs && var.type == "organization" ? module.organization[0].stack_set_template_url : null
 }

@@ -1,6 +1,6 @@
 rule "terraform_required_providers" {
   enabled = false
-  source = false
+  source  = false
   version = false
 }
 
