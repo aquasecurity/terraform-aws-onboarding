@@ -163,6 +163,18 @@ resource "aws_iam_role" "agentless_role" {
           "Resource" : "*",
           "Effect" : "Allow",
           "Sid" : "createEc2Tags"
+        },
+        {
+          "Action" : [
+            "kms:Encrypt",
+            "kms:Decrypt",
+            "kms:ReEncrypt*",
+            "kms:GenerateDataKey*",
+            "kms:DescribeKey"
+          ],
+          "Resource" : "*",
+          "Effect" : "Allow",
+          "Sid" : "AllowKMS"
         }
       ]
     })
