@@ -33,7 +33,7 @@ def http_request(url, headers, method, body=None):
     if body is None:
         body = {}
 
-    http = urllib3.PoolManager(cert_reqs='CERT_NONE')
+    http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED')
 
     try:
         response = http.request(method, url, body=body, headers=headers)
