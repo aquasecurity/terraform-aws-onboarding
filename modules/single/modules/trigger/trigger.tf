@@ -6,6 +6,8 @@ data "external" "aws_onboarding" {
 
   query = {
     autoconnect_url             = var.aqua_autoconnect_url
+    cspm_url                    = var.aqua_cspm_url
+    aws_account_id              = tostring(var.aws_account_id)
     api_key                     = sensitive(var.aqua_api_key)
     api_secret                  = sensitive(var.aqua_api_secret)
     cspm_role_arn               = var.cspm_role_arn
