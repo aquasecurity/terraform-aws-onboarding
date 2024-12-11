@@ -1,5 +1,10 @@
 # modules/single/modules/trigger/variables.tf
 
+variable "aws_account_id" {
+  description = "AWS Account ID"
+  type        = string
+}
+
 variable "aqua_api_key" {
   description = "Aqua API Key"
   type        = string
@@ -14,6 +19,11 @@ variable "aqua_api_secret" {
 
 variable "aqua_autoconnect_url" {
   description = "Aqua Autoconnect API URL"
+  type        = string
+}
+
+variable "aqua_cspm_url" {
+  description = "Aqua CSPM API URL"
   type        = string
 }
 

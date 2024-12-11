@@ -54,6 +54,8 @@ module "trigger" {
   aqua_api_key           = var.aqua_api_key
   aqua_api_secret        = var.aqua_api_secret
   aqua_autoconnect_url   = var.aqua_autoconnect_url
+  aqua_cspm_url          = var.aqua_cspm_url
+  aws_account_id         = local.aws_account_id
   aqua_session_id        = var.aqua_session_id
   cspm_role_arn          = module.lambda.cspm_role_arn
   cspm_external_id       = module.lambda.cspm_external_id
