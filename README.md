@@ -38,8 +38,6 @@ Before using this module, ensure that you have the following:
 
 **Notes:**
 - Ensure that the provided regions are enabled in your AWS account. If the provided regions are not enabled, they will be skipped even if they had been defined within Aqua's scan settings during onboarding.
-- If you change parameters after initial deployment, we recommend running `terraform destroy` before applying the changes again to avoid certain Lambda errors.
-
 
 ## Examples
 
