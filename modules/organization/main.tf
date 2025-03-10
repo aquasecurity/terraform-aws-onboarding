@@ -21,7 +21,7 @@ resource "aws_cloudformation_stack_set" "stack_set" {
     RandomID                       = var.aqua_random_id,
     ConfigurationID                = var.aqua_session_id,
     OrganizationID                 = var.organizational_unit_id,
-    DeployedInfrastractureRegion   = var.region,
+    DeployedInfrastructureRegion   = var.region,
     AdditionalTags                 = join(",", [for key, value in var.additional_tags : "${key}:${value}"])
     CustomCSPMRoleName             = var.custom_cspm_role_name
     CustomAgentlessRoleName        = var.custom_agentless_role_name
