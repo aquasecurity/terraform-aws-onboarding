@@ -11,6 +11,13 @@ resource "aws_cloudformation_stack_set" "stack_set" {
     enabled                          = true
     retain_stacks_on_account_removal = false
   }
+
+  operation_preferences {
+    failure_tolerance_percentage = 100
+    region_concurrency_type     = "PARALLEL"
+    max_concurrent_percentage    = 100
+  }
+
   parameters = {
     AquaApiKey                     = sensitive(var.aqua_api_key),
     AquaSecretKey                  = sensitive(var.aqua_api_secret),
