@@ -149,3 +149,8 @@ variable "additional_tags" {
   description = "Additional resource tags to will be send to the Autoconnect API"
   type        = map(string)
 }
+
+variable "custom_cspm_regions" {
+  description = "Custom CSPM regions"
+  type        = string
+}

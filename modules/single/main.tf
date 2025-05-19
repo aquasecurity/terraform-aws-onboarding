@@ -25,6 +25,7 @@ module "lambda" {
   aqua_cspm_role_prefix       = var.aqua_cspm_role_prefix
   custom_agentless_role_name  = var.custom_agentless_role_name
   custom_cspm_role_name       = var.custom_cspm_role_name
+  custom_cspm_regions         =  var.custom_cspm_regions
   depends_on                  = [module.kinesis]
 
 }

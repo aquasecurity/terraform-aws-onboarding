@@ -41,6 +41,7 @@ resource "aws_cloudformation_stack_set" "stack_set" {
     CustomVpcSubnetRouteTable2Name = var.custom_vpc_subnet_route_table2_name
     CustomInternetGatewayName      = var.custom_internet_gateway_name
     CustomSecurityGroupName        = var.custom_security_group_name
+    CustomCSPMRegions              = var.custom_cspm_regions
   }
 }
 

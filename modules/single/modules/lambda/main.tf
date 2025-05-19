@@ -469,6 +469,7 @@ resource "aws_lambda_invocation" "create_cspm_key_function" {
     ExternalId    = local.cspm_external_id
     AccountId     = tostring(var.aws_account_id)
     GroupId       = var.aqua_cspm_group_id
+    CustomCSPMRegions = var.custom_cspm_regions
   })
   triggers = {
     always_run = timestamp()

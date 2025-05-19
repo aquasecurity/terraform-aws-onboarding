@@ -69,3 +69,8 @@ variable "aws_account_id" {
   description = "AWS Account ID"
   type        = number
 }
+
+variable "custom_cspm_regions" {
+  description = "Custom CSPM regions"
+  type        = string
+}

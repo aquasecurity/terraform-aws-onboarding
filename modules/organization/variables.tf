@@ -120,3 +120,9 @@ variable "custom_security_group_name" {
   description = "Custom Security Group Name"
   type        = string
 }
+
+variable "custom_cspm_regions" {
+    description = "Custom CSPM regions"
+    type        = string
+    default     = ""
+}
