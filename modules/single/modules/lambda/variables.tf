@@ -8,11 +8,13 @@ variable "random_id" {
 variable "aqua_api_key" {
   description = "Aqua API Key"
   type        = string
+  sensitive   = true
 }
 
 variable "aqua_api_secret" {
   description = "Aqua API Secret"
   type        = string
+  sensitive   = true
 }
 
 variable "aqua_volscan_aws_account_id" {
