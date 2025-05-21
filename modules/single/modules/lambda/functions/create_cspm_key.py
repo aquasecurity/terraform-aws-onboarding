@@ -12,6 +12,7 @@ def handler(event, context):
     account_id = event.get('AccountId')
     external_id = event.get('ExternalId')
     group = int(event.get('GroupId'))
+    custom_regions = event.get('CustomCSPMRegions')
     aws_account_id = context.invoked_function_arn.split(":")[4]
 
     try:
@@ -23,7 +24,7 @@ def handler(event, context):
         print('Creating new CSPM key')
         is_already_cspm_client = create_cspm_key(
             cspm_url, aqua_api_key, aqua_secret,
-            role_arn, external_id, group, account_id, aws_account_id
+            role_arn, external_id, group, account_id, aws_account_id, custom_regions
         )
 
     return {"IsAlreadyCSPMClient": is_already_cspm_client}
@@ -67,7 +68,7 @@ def get_cspm_key_id(aqua_api_key, aqua_secret, cspm_url, role_arn):
     raise Exception("key not found")
 
 
-def create_cspm_key(cspm_url, aqua_api_key, aqua_secret, role_arn, external_id, group, account_id, aws_account_id):
+def create_cspm_key(cspm_url, aqua_api_key, aqua_secret, role_arn, external_id, group, account_id, aws_account_id, custom_regions):
     body = {
         "name": account_id,
         "cloud": "aws",
@@ -76,6 +77,9 @@ def create_cspm_key(cspm_url, aqua_api_key, aqua_secret, role_arn, external_id, 
         "external_id": external_id,
         "group_id": group
     }
+
+    if custom_regions != "":
+        body['enabled_regions'] = custom_regions
 
     print(f'CSPM body: {body}')
     tstmp = str(int(time.time() * 1000))

@@ -39,6 +39,7 @@ module "single" {
   custom_vpc_subnet2_name             = var.custom_vpc_subnet2_name
   custom_vpc_subnet_route_table1_name = var.custom_vpc_subnet_route_table1_name
   custom_vpc_subnet_route_table2_name = var.custom_vpc_subnet_route_table2_name
+  custom_cspm_regions                 = var.custom_cspm_regions
 }
 
 module "organization" {
@@ -68,4 +69,5 @@ module "organization" {
   custom_vpc_subnet2_name             = var.custom_vpc_subnet2_name
   custom_vpc_subnet_route_table1_name = var.custom_vpc_subnet_route_table1_name
   custom_vpc_subnet_route_table2_name = var.custom_vpc_subnet_route_table2_name
+  custom_cspm_regions                 = var.custom_cspm_regions
 }

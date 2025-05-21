@@ -101,6 +101,7 @@ Before using this module, ensure that you have the following:
 | <a name="input_create_vpcs"></a> [create\_vpcs](#input\_create\_vpcs) | Toggle to create VPCs | `bool` | `true` | no |
 | <a name="input_custom_agentless_role_name"></a> [custom\_agentless\_role\_name](#input\_custom\_agentless\_role\_name) | Custom Agentless role Name | `string` | `""` | no |
 | <a name="input_custom_bucket_name"></a> [custom\_bucket\_name](#input\_custom\_bucket\_name) | Custom bucket Name | `string` | `""` | no |
+| <a name="input_custom_cspm_regions"></a> [custom\_cspm\_regions](#input\_custom\_cspm\_regions) | Custom CSPM regions | `string` | `""` | no |
 | <a name="input_custom_cspm_role_name"></a> [custom\_cspm\_role\_name](#input\_custom\_cspm\_role\_name) | Custom CSPM role Name | `string` | `""` | no |
 | <a name="input_custom_internet_gateway_name"></a> [custom\_internet\_gateway\_name](#input\_custom\_internet\_gateway\_name) | Custom Internet Gateway Name | `string` | `""` | no |
 | <a name="input_custom_processor_lambda_role_name"></a> [custom\_processor\_lambda\_role\_name](#input\_custom\_processor\_lambda\_role\_name) | Custom Processor lambda role Name | `string` | `""` | no |
