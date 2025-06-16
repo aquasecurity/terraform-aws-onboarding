@@ -116,6 +116,7 @@ Before using this module, ensure that you have the following:
 | <a name="input_regions"></a> [regions](#input\_regions) | AWS Regions to deploy discovery and scanning resources | `list(string)` | n/a | yes |
 | <a name="input_show_outputs"></a> [show\_outputs](#input\_show\_outputs) | Whether to show outputs after deployment | `bool` | `false` | no |
 | <a name="input_type"></a> [type](#input\_type) | The type of onboarding. Valid values are 'single' or 'organization' onboarding types | `string` | n/a | yes |
+| <a name="input_volume_scanning_deployment"></a> [volume\_scanning\_deployment](#input\_volume\_scanning\_deployment) | Toggle to deploy Volume Scanning resources | `string` | `"true"` | no |
 
 ## Outputs
 
