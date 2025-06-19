@@ -126,3 +126,9 @@ variable "custom_cspm_regions" {
     type        = string
     default     = ""
 }
+
+variable "volume_scanning_deployment" {
+  description = "Toggle to deploy Volume Scanning resources"
+  type = string
+  default = "true"
+}
