@@ -154,3 +154,9 @@ variable "custom_cspm_regions" {
   description = "Custom CSPM regions"
   type        = string
 }
+
+variable "volume_scanning_deployment" {
+  description = "Toggle to deploy volume scanning resources"
+  type        = string
+  default     = "true"
+}

@@ -38,6 +38,7 @@ resource "aws_iam_role" "cspm_lambda_execution_role" {
 
 # Create generate Volume Scan external id lambda function
 resource "aws_lambda_function" "generate_volscan_external_id_function" {
+  count            = var.create_vol_scan_resource ? 1 : 0
   architectures    = ["x86_64"]
   description      = "Generate Volume Scanning External ID"
   function_name    = "aqua-autoconnect-generate-volscan-external-id-function-${var.random_id}"
@@ -54,7 +55,8 @@ resource "aws_lambda_function" "generate_volscan_external_id_function" {
 
 # Invoking generate Volume Scan external id lambda function
 resource "aws_lambda_invocation" "generate_volscan_external_id_function" {
-  function_name = aws_lambda_function.generate_volscan_external_id_function.function_name
+  count         = var.create_vol_scan_resource ? 1 : 0
+  function_name = aws_lambda_function.generate_volscan_external_id_function[0].function_name
   input = jsonencode({
     ApiUrl            = var.aqua_cspm_url
     AutoConnectApiUrl = var.aqua_autoconnect_url
@@ -100,6 +102,7 @@ resource "aws_lambda_invocation" "generate_cspm_external_id_function" {
 # Create Agentless role
 # trivy:ignore:AVD-AWS-0057
 resource "aws_iam_role" "agentless_role" {
+  count = var.create_vol_scan_resource ? 1 : 0
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -462,13 +465,13 @@ resource "aws_lambda_function" "create_cspm_key_function" {
 resource "aws_lambda_invocation" "create_cspm_key_function" {
   function_name = aws_lambda_function.create_cspm_key_function.function_name
   input = jsonencode({
-    ApiUrl        = var.aqua_cspm_url
-    AquaApiKey    = var.aqua_api_key
-    AquaSecretKey = var.aqua_api_secret
-    RoleArn       = aws_iam_role.cspm_role.arn
-    ExternalId    = local.cspm_external_id
-    AccountId     = tostring(var.aws_account_id)
-    GroupId       = var.aqua_cspm_group_id
+    ApiUrl            = var.aqua_cspm_url
+    AquaApiKey        = var.aqua_api_key
+    AquaSecretKey     = var.aqua_api_secret
+    RoleArn           = aws_iam_role.cspm_role.arn
+    ExternalId        = local.cspm_external_id
+    AccountId         = tostring(var.aws_account_id)
+    GroupId           = var.aqua_cspm_group_id
     CustomCSPMRegions = var.custom_cspm_regions
   })
   triggers = {

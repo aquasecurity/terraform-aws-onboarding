@@ -2,6 +2,7 @@
 
 # Create Stackset admin role
 resource "aws_iam_role" "stackset_admin_role" {
+  count = var.create_vol_scan_resource ? 1 : 0
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -41,13 +42,14 @@ resource "aws_iam_role" "stackset_admin_role" {
 # Create Stackset execution role
 # trivy:ignore:AVD-AWS-0057
 resource "aws_iam_role" "stackset_execution_role" {
+  count = var.create_vol_scan_resource ? 1 : 0
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : aws_iam_role.stackset_admin_role.arn
+          "AWS" : aws_iam_role.stackset_admin_role[0].arn
         },
         "Action" : "sts:AssumeRole"
       }
@@ -121,12 +123,13 @@ resource "aws_iam_role" "stackset_execution_role" {
 
 # Create Cloudformation stackset
 resource "aws_cloudformation_stack_set" "stack_set" {
+  count                   = var.create_vol_scan_resource ? 1 : 0
   name                    = "aqua-autoconnect-stackset-${var.random_id}"
   description             = "Aqua Agentless StackSet"
   permission_model        = "SELF_MANAGED"
   capabilities            = ["CAPABILITY_IAM"]
-  administration_role_arn = aws_iam_role.stackset_admin_role.arn
-  execution_role_name     = aws_iam_role.stackset_execution_role.name
+  administration_role_arn = aws_iam_role.stackset_admin_role[0].arn
+  execution_role_name     = aws_iam_role.stackset_execution_role[0].name
   template_url            = "https://${var.aqua_bucket_name}.s3.amazonaws.com/volume-scanning-api-key-cfn-stackset.json"
   operation_preferences {
     region_concurrency_type = "PARALLEL"
@@ -147,8 +150,8 @@ resource "aws_cloudformation_stack_set" "stack_set" {
 
 # Create Cloudformation stackset instance for each enabled region specified
 resource "aws_cloudformation_stack_set_instance" "stack_set_instance" {
-  for_each       = toset(var.enabled_regions)
-  stack_set_name = aws_cloudformation_stack_set.stack_set.name
+  for_each       = var.create_vol_scan_resource ? toset(var.enabled_regions) : toset([])
+  stack_set_name = aws_cloudformation_stack_set.stack_set[0].name
   account_id     = var.aws_account_id
   region         = each.value
 }

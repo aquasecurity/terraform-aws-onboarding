@@ -7,6 +7,7 @@ module "kinesis" {
   aqua_volscan_api_token            = var.aqua_volscan_api_token
   custom_bucket_name                = var.custom_bucket_name
   custom_processor_lambda_role_name = var.custom_processor_lambda_role_name
+  create_vol_scan_resource    = var.volume_scanning_deployment == "true" ? true : false
 }
 
 module "lambda" {
@@ -25,9 +26,9 @@ module "lambda" {
   aqua_cspm_role_prefix       = var.aqua_cspm_role_prefix
   custom_agentless_role_name  = var.custom_agentless_role_name
   custom_cspm_role_name       = var.custom_cspm_role_name
-  custom_cspm_regions         =  var.custom_cspm_regions
+  custom_cspm_regions         = var.custom_cspm_regions
+  create_vol_scan_resource    = var.volume_scanning_deployment == "true" ? true : false
   depends_on                  = [module.kinesis]
-
 }
 
 module "stackset" {
@@ -46,6 +47,7 @@ module "stackset" {
   custom_vpc_subnet2_name             = var.custom_vpc_subnet2_name
   custom_security_group_name          = var.custom_security_group_name
   event_bus_arn                       = module.kinesis.event_bus_arn
+  create_vol_scan_resource            = var.volume_scanning_deployment == "true" ? true : false
   depends_on                          = [module.lambda]
 }
 
@@ -64,5 +66,6 @@ module "trigger" {
   volscan_role_arn       = module.lambda.agentless_role_arn
   volscan_external_id    = module.lambda.volscan_external_id
   additional_tags        = var.additional_tags
+  create_vol_scan_resource    = var.volume_scanning_deployment == "true" ? true : false
   depends_on             = [module.stackset]
 }

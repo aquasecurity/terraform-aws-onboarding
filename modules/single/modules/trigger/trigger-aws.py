@@ -21,6 +21,7 @@ cloud = "aws"
 region = query.get('region')
 additional_resource_tags = query.get('additional_tags')
 aws_account_id = query.get('aws_account_id')
+volume_scanning_deployment = query.get('volume_scanning_deployment')
 tstmp = str(int(time.time() * 1000))
 
 
@@ -100,6 +101,7 @@ def trigger_discovery():
         "is_already_cspm_client": is_already_cspm_client,
         "deployment_method": "Terraform",
         "additional_resource_tags": additional_resource_tags,
+        "volume_scanning_deployment": volume_scanning_deployment,
         "payload": {
             "cspm": {
                 "role_arn": cspm_role_arn,
