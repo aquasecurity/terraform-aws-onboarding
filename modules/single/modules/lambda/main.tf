@@ -96,7 +96,6 @@ resource "aws_lambda_invocation" "generate_cspm_external_id_function" {
   triggers = {
     always_run = timestamp()
   }
-  depends_on = [aws_lambda_invocation.generate_volscan_external_id_function]
 }
 
 # Create Agentless role
