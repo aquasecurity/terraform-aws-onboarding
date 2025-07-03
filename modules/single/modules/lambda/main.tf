@@ -189,7 +189,7 @@ resource "aws_iam_role" "agentless_role" {
     })
   }
   name       = var.custom_agentless_role_name == "" ? "aqua-agentless-role-${var.random_id}" : var.custom_agentless_role_name
-  depends_on = [aws_lambda_invocation.generate_volscan_external_id_function]
+  depends_on = [aws_lambda_invocation.generate_volscan_external_id_function[0]]
 }
 
 # Create CSPM role
