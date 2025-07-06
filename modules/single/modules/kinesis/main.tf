@@ -2,15 +2,17 @@
 
 # Create Cloudwatch event bus
 resource "aws_cloudwatch_event_bus" "event_bus" {
-  name = "aqua-bus-${var.random_id}"
+  count = var.create_vol_scan_resource ? 1 : 0
+  name  = "aqua-bus-${var.random_id}"
 }
 
 # Create Cloudwatch event rule for EBS events
 resource "aws_cloudwatch_event_rule" "event_rule" {
+  count          = var.create_vol_scan_resource ? 1 : 0
   name           = "aqua-autoconnect-event-rule-${var.random_id}"
   description    = "Aqua EventBridge rule"
-  event_bus_name = aws_cloudwatch_event_bus.event_bus.name
-  role_arn       = aws_iam_role.kinesis_stream_events_role.arn
+  event_bus_name = aws_cloudwatch_event_bus.event_bus[0].name
+  role_arn       = aws_iam_role.kinesis_stream_events_role[0].arn
   event_pattern = jsonencode({
     "detail" : {
       "event" : [
@@ -33,12 +35,14 @@ resource "aws_cloudwatch_event_rule" "event_rule" {
 # Create Kinesis Processor lambda Cloudwatch log group
 # trivy:ignore:AVD-AWS-0017
 resource "aws_cloudwatch_log_group" "kinesis_processor_lambda_log_group" {
+  count             = var.create_vol_scan_resource ? 1 : 0
   name              = "/aws/lambda/aqua-autoconnect-kinesis-processor-lambda-${var.random_id}"
   retention_in_days = 7
 }
 
 # Create Kinesis Data Stream Events role
 resource "aws_iam_role" "kinesis_stream_events_role" {
+  count = var.create_vol_scan_resource ? 1 : 0
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -61,7 +65,7 @@ resource "aws_iam_role" "kinesis_stream_events_role" {
             "kinesis:PutRecord",
             "kinesis:PutRecords"
           ],
-          "Resource" : aws_kinesis_stream.kinesis_stream.arn,
+          "Resource" : aws_kinesis_stream.kinesis_stream[0].arn,
           "Effect" : "Allow"
         }
       ]
@@ -73,6 +77,7 @@ resource "aws_iam_role" "kinesis_stream_events_role" {
 # Create Kinesis Firehose role
 #tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_role" "kinesis_firehose_role" {
+  count = var.create_vol_scan_resource ? 1 : 0
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -98,7 +103,7 @@ resource "aws_iam_role" "kinesis_firehose_role" {
             "kinesis:GetShardIterator",
             "kinesis:ListShards"
           ],
-          "Resource" : aws_kinesis_stream.kinesis_stream.arn,
+          "Resource" : aws_kinesis_stream.kinesis_stream[0].arn,
           "Effect" : "Allow",
           "Sid" : "kinesisStreamPermissions"
         },
@@ -107,7 +112,7 @@ resource "aws_iam_role" "kinesis_firehose_role" {
             "lambda:GetFunctionConfiguration",
             "lambda:InvokeFunction"
           ],
-          "Resource" : aws_kinesis_stream.kinesis_stream.arn,
+          "Resource" : aws_kinesis_stream.kinesis_stream[0].arn,
           "Effect" : "Allow",
           "Sid" : "lambdaPermissions"
         },
@@ -120,8 +125,8 @@ resource "aws_iam_role" "kinesis_firehose_role" {
             "s3:PutObject"
           ],
           "Resource" : [
-            aws_s3_bucket.kinesis_firehose_bucket.arn,
-            "${aws_s3_bucket.kinesis_firehose_bucket.arn}/*"
+            aws_s3_bucket.kinesis_firehose_bucket[0].arn,
+            "${aws_s3_bucket.kinesis_firehose_bucket[0].arn}/*"
           ],
           "Effect" : "Allow",
           "Sid" : "s3Permissions"
@@ -134,6 +139,7 @@ resource "aws_iam_role" "kinesis_firehose_role" {
 
 # Create Kinesis Processor lambda execution role
 resource "aws_iam_role" "processor_lambda_execution_role" {
+  count = var.create_vol_scan_resource ? 1 : 0
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -169,12 +175,14 @@ resource "aws_iam_role" "processor_lambda_execution_role" {
 # trivy:ignore:AVD-AWS-0090
 # trivy:ignore:AVD-AWS-0089
 resource "aws_s3_bucket" "kinesis_firehose_bucket" {
+  count  = var.create_vol_scan_resource ? 1 : 0
   bucket = var.custom_bucket_name == "" ? "aqua-autoconnect-kinesis-firehose-bucket-${var.random_id}" : var.custom_bucket_name
 }
 
 # Create Kinesis Firehose S3 bucket lifecycle configuration
 resource "aws_s3_bucket_lifecycle_configuration" "kinesis_firehose_bucket" {
-  bucket = aws_s3_bucket.kinesis_firehose_bucket.bucket
+  count  = var.create_vol_scan_resource ? 1 : 0
+  bucket = aws_s3_bucket.kinesis_firehose_bucket[0].bucket
   rule {
     expiration {
       days                         = 7
@@ -187,7 +195,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "kinesis_firehose_bucket" {
 
 # Create Kinesis Firehose S3 bucket public access block
 resource "aws_s3_bucket_public_access_block" "kinesis_firehose_bucket" {
-  bucket                  = aws_s3_bucket.kinesis_firehose_bucket.bucket
+  count                   = var.create_vol_scan_resource ? 1 : 0
+  bucket                  = aws_s3_bucket.kinesis_firehose_bucket[0].bucket
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -197,7 +206,8 @@ resource "aws_s3_bucket_public_access_block" "kinesis_firehose_bucket" {
 # Create Kinesis Firehose S3 bucket SSE configuration
 # trivy:ignore:AVD-AWS-0132
 resource "aws_s3_bucket_server_side_encryption_configuration" "kinesis_firehose_bucket" {
-  bucket = aws_s3_bucket.kinesis_firehose_bucket.bucket
+  count  = var.create_vol_scan_resource ? 1 : 0
+  bucket = aws_s3_bucket.kinesis_firehose_bucket[0].bucket
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -209,11 +219,12 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "kinesis_firehose_
 # Create Kinesis Processor lambda function
 # trivy:ignore:AVD-AWS-0066
 resource "aws_lambda_function" "kinesis_processor_lambda" {
+  count            = var.create_vol_scan_resource ? 1 : 0
   architectures    = ["x86_64"]
   description      = "Aqua Kinesis Firehose Processor Lambda"
   function_name    = "aqua-autoconnect-kinesis-processor-lambda-function-${var.random_id}"
   handler          = "index.handler"
-  role             = aws_iam_role.processor_lambda_execution_role.arn
+  role             = aws_iam_role.processor_lambda_execution_role[0].arn
   runtime          = "python3.12"
   timeout          = 900
   filename         = data.archive_file.kinesis_processor_function.output_path
@@ -225,6 +236,7 @@ resource "aws_lambda_function" "kinesis_processor_lambda" {
 
 # Create Kinesis Stream
 resource "aws_kinesis_stream" "kinesis_stream" {
+  count           = var.create_vol_scan_resource ? 1 : 0
   encryption_type = "KMS"
   kms_key_id      = "alias/aws/kinesis"
   name            = "aqua-autoconnect-kinesis-datastream-${var.random_id}"
@@ -233,6 +245,7 @@ resource "aws_kinesis_stream" "kinesis_stream" {
 
 # Create Kinesis Firehose Delivery Stream
 resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose" {
+  count       = var.create_vol_scan_resource ? 1 : 0
   destination = "http_endpoint"
   http_endpoint_configuration {
     access_key         = var.aqua_volscan_api_token
@@ -244,21 +257,21 @@ resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose" {
       processors {
         parameters {
           parameter_name  = "LambdaArn"
-          parameter_value = aws_lambda_function.kinesis_processor_lambda.arn
+          parameter_value = aws_lambda_function.kinesis_processor_lambda[0].arn
         }
         type = "Lambda"
       }
     }
-    role_arn = aws_iam_role.kinesis_firehose_role.arn
+    role_arn = aws_iam_role.kinesis_firehose_role[0].arn
     url      = var.aqua_volscan_api_url
     s3_configuration {
-      bucket_arn = aws_s3_bucket.kinesis_firehose_bucket.arn
-      role_arn   = aws_iam_role.kinesis_firehose_role.arn
+      bucket_arn = aws_s3_bucket.kinesis_firehose_bucket[0].arn
+      role_arn   = aws_iam_role.kinesis_firehose_role[0].arn
     }
   }
   kinesis_source_configuration {
-    kinesis_stream_arn = aws_kinesis_stream.kinesis_stream.arn
-    role_arn           = aws_iam_role.kinesis_firehose_role.arn
+    kinesis_stream_arn = aws_kinesis_stream.kinesis_stream[0].arn
+    role_arn           = aws_iam_role.kinesis_firehose_role[0].arn
   }
   name = "aqua-autoconnect-kinesis-firehose-${var.random_id}"
 }

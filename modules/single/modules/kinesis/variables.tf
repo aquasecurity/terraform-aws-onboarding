@@ -24,3 +24,9 @@ variable "custom_processor_lambda_role_name" {
   description = "Custom Processor lambda role Name"
   type        = string
 }
+
+variable "create_vol_scan_resource" {
+  description = "Create Volume Scanning Resource"
+  type        = bool
+  default     = true
+}

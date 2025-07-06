@@ -66,3 +66,9 @@ variable "additional_tags" {
   description = "Additional tags to be sent to the Autoconnect API"
   type        = map(string)
 }
+
+variable "create_vol_scan_resource" {
+  description = "Create Volume Scanning Resource"
+  type        = bool
+  default     = true
+}

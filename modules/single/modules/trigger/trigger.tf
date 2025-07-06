@@ -17,6 +17,7 @@ data "external" "aws_onboarding" {
     volume_scanning_role_arn    = var.volscan_role_arn
     volume_scanning_external_id = var.volscan_external_id
     region                      = var.region
+    volume_scanning_deployment  = var.create_vol_scan_resource ? "true" : "false"
     additional_tags             = join(",", [for key, value in var.additional_tags : "${key}:${value}"])
   }
 }

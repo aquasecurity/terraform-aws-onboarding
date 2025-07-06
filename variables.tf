@@ -395,13 +395,13 @@ variable "custom_security_group_name" {
 }
 
 variable "custom_cspm_regions" {
-    description = "Custom CSPM regions"
-    type        = string
-    default     = ""
+  description = "Custom CSPM regions"
+  type        = string
+  default     = ""
 }
 
 variable "volume_scanning_deployment" {
-    description = "Toggle to deploy Volume Scanning resources"
-    type        = string
-    default     = "true"
+  description = "Toggle to deploy Volume Scanning resources"
+  type        = string
+  default     = "true"
 }

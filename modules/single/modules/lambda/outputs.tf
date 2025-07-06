@@ -27,5 +27,5 @@ output "cspm_role_arn" {
 
 output "agentless_role_arn" {
   description = "The ARN of the IAM role created for the Agentless Volume Scanning"
-  value       = aws_iam_role.agentless_role.arn
+  value       = try(aws_iam_role.agentless_role[0].arn, "")
 }

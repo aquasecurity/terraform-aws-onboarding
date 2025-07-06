@@ -76,3 +76,9 @@ variable "custom_cspm_regions" {
   description = "Custom CSPM regions"
   type        = string
 }
+
+variable "create_vol_scan_resource" {
+  description = "Create Volume Scanning Resource"
+  type        = bool
+  default     = true
+}

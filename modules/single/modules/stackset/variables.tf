@@ -69,3 +69,9 @@ variable "event_bus_arn" {
   description = "Cloudwatch Event Bus ARN"
   type        = string
 }
+
+variable "create_vol_scan_resource" {
+  description = "Create Volume Scanning Resource"
+  type        = bool
+  default     = true
+}
