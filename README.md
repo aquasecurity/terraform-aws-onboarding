@@ -98,6 +98,7 @@ Before using this module, ensure that you have the following:
 | <a name="input_aqua_volscan_api_url"></a> [aqua\_volscan\_api\_url](#input\_aqua\_volscan\_api\_url) | Aqua Volume Scanning API URL | `string` | n/a | yes |
 | <a name="input_aqua_volscan_aws_account_id"></a> [aqua\_volscan\_aws\_account\_id](#input\_aqua\_volscan\_aws\_account\_id) | Aqua Volume Scanning AWS Account ID | `string` | n/a | yes |
 | <a name="input_aqua_worker_role_arn"></a> [aqua\_worker\_role\_arn](#input\_aqua\_worker\_role\_arn) | Aqua Worker Role ARN | `string` | n/a | yes |
+| <a name="input_base_cspm"></a> [base\_cspm](#input\_base\_cspm) | Toggle for base CSPM only | `bool` | `false` | no |
 | <a name="input_create_vpcs"></a> [create\_vpcs](#input\_create\_vpcs) | Toggle to create VPCs | `bool` | `true` | no |
 | <a name="input_custom_agentless_role_name"></a> [custom\_agentless\_role\_name](#input\_custom\_agentless\_role\_name) | Custom Agentless role Name | `string` | `""` | no |
 | <a name="input_custom_bucket_name"></a> [custom\_bucket\_name](#input\_custom\_bucket\_name) | Custom bucket Name | `string` | `""` | no |
