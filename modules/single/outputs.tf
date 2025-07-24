@@ -62,11 +62,6 @@ output "volscan_external_id" {
   value       = try(module.lambda.volscan_external_id, null)
 }
 
-output "is_already_cspm_client" {
-  description = "Boolean indicating if the client is already a CSPM client, to be sent to the Autoconnect API"
-  value       = try(module.lambda.is_already_cspm_client, null)
-}
-
 output "cspm_lambda_execution_role_arn" {
   description = "The ARN of the lambda execution IAM role created for the CSPM"
   value       = try(module.lambda.cspm_lambda_execution_role_arn, null)

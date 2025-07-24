@@ -446,38 +446,3 @@ resource "time_sleep" "sleep" {
   }
   depends_on = [aws_iam_role.cspm_role]
 }
-
-# Create CSPM key lambda function
-resource "aws_lambda_function" "create_cspm_key_function" {
-  architectures    = ["x86_64"]
-  description      = "Trigger CSPM via CSPM Api"
-  function_name    = "aqua-autoconnect-create-cspm-key-function-${var.random_id}"
-  handler          = "create_cspm_key.handler"
-  role             = aws_iam_role.cspm_lambda_execution_role.arn
-  runtime          = "python3.12"
-  timeout          = 120
-  filename         = data.archive_file.create_cspm_key_function.output_path
-  source_code_hash = data.archive_file.create_cspm_key_function.output_base64sha256
-  tracing_config {
-    mode = "Active"
-  }
-}
-
-# Invoking CSPM key lambda function
-resource "aws_lambda_invocation" "create_cspm_key_function" {
-  function_name = aws_lambda_function.create_cspm_key_function.function_name
-  input = jsonencode({
-    ApiUrl            = var.aqua_cspm_url
-    AquaApiKey        = var.aqua_api_key
-    AquaSecretKey     = var.aqua_api_secret
-    RoleArn           = aws_iam_role.cspm_role.arn
-    ExternalId        = local.cspm_external_id
-    AccountId         = tostring(var.aws_account_id)
-    GroupId           = var.aqua_cspm_group_id
-    CustomCSPMRegions = var.custom_cspm_regions
-  })
-  triggers = {
-    always_run = timestamp()
-  }
-  depends_on = [time_sleep.sleep]
-}

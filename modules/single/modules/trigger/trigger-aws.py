@@ -13,7 +13,6 @@ aqua_api_key = query.get('api_key')
 aqua_secret = query.get('api_secret')
 cspm_role_arn = query.get('cspm_role_arn')
 cspm_external_id = query.get('cspm_external_id')
-is_already_cspm_client = query.get('is_already_cspm_client')
 session_id = query.get('session_id')
 vol_scan_role_arn = query.get('volume_scanning_role_arn')
 vol_scan_external_id = query.get('volume_scanning_external_id')
@@ -23,6 +22,9 @@ additional_resource_tags = query.get('additional_tags')
 aws_account_id = query.get('aws_account_id')
 volume_scanning_deployment = query.get('volume_scanning_deployment')
 tstmp = str(int(time.time() * 1000))
+base_cspm = query.get('base_cspm', 'false').lower() == 'true'
+custom_regions = query.get('custom_cspm_regions')
+cspm_group_id = int(query.get('cspm_group_id'))
 
 
 def get_signature(aqua_secret, tstmp, path, method, body=''):
@@ -98,10 +100,12 @@ def trigger_discovery():
     body = json.dumps({
         "cloud": cloud,
         "configuration_id": session_id,
-        "is_already_cspm_client": is_already_cspm_client,
         "deployment_method": "Terraform",
         "additional_resource_tags": additional_resource_tags,
         "volume_scanning_deployment": volume_scanning_deployment,
+        "base_cspm": base_cspm,
+        "cspm_group_id": cspm_group_id,
+        "enabled_regions": custom_regions,
         "payload": {
             "cspm": {
                 "role_arn": cspm_role_arn,
@@ -116,10 +120,20 @@ def trigger_discovery():
     })
 
     sig = get_signature(aqua_secret, tstmp, "/v2/internal_apikeys", "GET", '')
+    body_cspm = (
+        '{"autoconnect":true,"base_cspm":' + str(base_cspm).lower() + ',"cloud":"aws","external_id":"' + cspm_external_id + '","group_id":' + str(int(cspm_group_id)) + ',"name":"' + aws_account_id + '","role_arn":"' + cspm_role_arn + '"}'
+    )
 
+    if custom_regions != "":
+        body_cspm = (
+            '{"autoconnect":true,"base_cspm":' + str(base_cspm).lower() + ',"cloud":"aws","enabled_regions":"' + custom_regions + '","external_id":"' + cspm_external_id + '","group_id":' + str(int(cspm_group_id)) + ',"name":"' + aws_account_id + '","role_arn":"' + cspm_role_arn + '"}'
+        )
+
+    cspm_sig = get_signature(aqua_secret, tstmp, "/v2/keys", "POST", body_cspm)
     headers = {
         "X-API-Key": aqua_api_key,
         "X-Authenticate-Api-Key-Signature": sig,
+        "X-Register-New-Cspm-Signature": cspm_sig,
         "X-Timestamp": tstmp
     }
 

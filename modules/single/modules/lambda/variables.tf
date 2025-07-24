@@ -32,11 +32,6 @@ variable "aqua_cspm_url" {
   type        = string
 }
 
-variable "aqua_cspm_group_id" {
-  description = "Aqua CSPM Group ID"
-  type        = number
-}
-
 variable "aqua_cspm_aws_account_id" {
   description = "Aqua CSPM AWS Account ID"
   type        = string
@@ -64,16 +59,6 @@ variable "custom_cspm_role_name" {
 
 variable "custom_agentless_role_name" {
   description = "Custom Agentless role Name"
-  type        = string
-}
-
-variable "aws_account_id" {
-  description = "AWS Account ID"
-  type        = number
-}
-
-variable "custom_cspm_regions" {
-  description = "Custom CSPM regions"
   type        = string
 }
 

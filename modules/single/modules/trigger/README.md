@@ -36,7 +36,6 @@ No modules.
 | <a name="input_aqua_session_id"></a> [aqua\_session\_id](#input\_aqua\_session\_id) | Aqua Session ID | `string` | n/a | yes |
 | <a name="input_cspm_external_id"></a> [cspm\_external\_id](#input\_cspm\_external\_id) | Aqua CSPM External ID | `string` | n/a | yes |
 | <a name="input_cspm_role_arn"></a> [cspm\_role\_arn](#input\_cspm\_role\_arn) | CSPM Role ARN | `string` | n/a | yes |
-| <a name="input_is_already_cspm_client"></a> [is\_already\_cspm\_client](#input\_is\_already\_cspm\_client) | Boolean indicating if the client is already a CSPM client, to be sent to the Autoconnect API | `bool` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Main AWS Region to to deploy resources | `string` | n/a | yes |
 | <a name="input_volscan_external_id"></a> [volscan\_external\_id](#input\_volscan\_external\_id) | Aqua Volume Scanning External ID | `string` | n/a | yes |
 | <a name="input_volscan_role_arn"></a> [volscan\_role\_arn](#input\_volscan\_role\_arn) | Volume Scanning Role ARN | `string` | n/a | yes |

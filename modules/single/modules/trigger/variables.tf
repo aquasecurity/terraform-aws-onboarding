@@ -42,11 +42,6 @@ variable "cspm_external_id" {
   type        = string
 }
 
-variable "is_already_cspm_client" {
-  description = "Boolean indicating if the client is already a CSPM client, to be sent to the Autoconnect API"
-  type        = bool
-}
-
 variable "volscan_role_arn" {
   description = "Volume Scanning Role ARN"
   type        = string
@@ -71,4 +66,21 @@ variable "create_vol_scan_resource" {
   description = "Create Volume Scanning Resource"
   type        = bool
   default     = true
+}
+
+variable "cspm_group_id" {
+  description = "Aqua CSPM Group ID"
+  type        = number
+}
+
+variable "custom_cspm_regions" {
+  description = "Custom CSPM regions"
+  type        = string
+  default = ""
+}
+
+variable "base_cspm" {
+  description = "Toggle for base CSPM only"
+  type        = bool
+  default     = false
 }
