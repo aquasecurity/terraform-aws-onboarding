@@ -17,9 +17,9 @@ data "external" "aws_onboarding" {
     volume_scanning_external_id = var.volscan_external_id
     region                      = var.region
     volume_scanning_deployment  = var.create_vol_scan_resource ? "true" : "false"
-    cspm_group_id                  = var.cspm_group_id
-    custom_cspm_regions = var.custom_cspm_regions
-    base_cspm = var.base_cspm
+    cspm_group_id               = var.cspm_group_id
+    custom_cspm_regions         = var.custom_cspm_regions
+    base_cspm                   = var.base_cspm
     additional_tags             = join(",", [for key, value in var.additional_tags : "${key}:${value}"])
   }
 }

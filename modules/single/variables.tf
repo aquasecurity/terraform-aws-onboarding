@@ -153,7 +153,7 @@ variable "additional_tags" {
 variable "custom_cspm_regions" {
   description = "Custom CSPM regions"
   type        = string
-  default = ""
+  default     = ""
 }
 
 variable "volume_scanning_deployment" {
