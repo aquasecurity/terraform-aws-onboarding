@@ -405,3 +405,9 @@ variable "volume_scanning_deployment" {
   type        = string
   default     = "true"
 }
+
+variable "base_cspm" {
+  description = "Toggle for base CSPM only"
+  type        = bool
+  default     = false
+}

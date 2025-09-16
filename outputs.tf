@@ -75,11 +75,6 @@ output "volscan_external_id" {
   value       = var.show_outputs && var.type == "single" ? module.single[0].volscan_external_id : null
 }
 
-output "is_already_cspm_client" {
-  description = "Boolean indicating if the client is already a CSPM client, to be sent to the Autoconnect API"
-  value       = var.show_outputs && var.type == "single" ? module.single[0].is_already_cspm_client : null
-}
-
 output "cspm_lambda_execution_role_arn" {
   description = "The ARN of the lambda execution IAM role created for the CSPM"
   value       = var.show_outputs && var.type == "single" ? module.single[0].kinesis_processor_lambda_execution_role_arn : null

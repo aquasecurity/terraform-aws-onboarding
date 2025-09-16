@@ -4,6 +4,8 @@ import hashlib
 import time
 import hmac
 
+# This Lambda isn't used currently, but it is kept for future use.
+
 def handler(event, context):
     cspm_url = event.get('ApiUrl')
     aqua_api_key = event.get('AquaApiKey')

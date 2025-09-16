@@ -153,10 +153,17 @@ variable "additional_tags" {
 variable "custom_cspm_regions" {
   description = "Custom CSPM regions"
   type        = string
+  default     = ""
 }
 
 variable "volume_scanning_deployment" {
   description = "Toggle to deploy volume scanning resources"
   type        = string
   default     = "true"
+}
+
+variable "base_cspm" {
+  description = "Toggle for base CSPM only"
+  type        = bool
+  default     = false
 }
