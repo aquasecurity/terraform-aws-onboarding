@@ -442,3 +442,102 @@ resource "time_sleep" "sleep" {
   }
   depends_on = [aws_iam_role.cspm_role]
 }
+
+# Create Registry Scanning role
+# trivy:ignore:AVD-AWS-0057
+resource "aws_iam_role" "registry_scanning_role" {
+  count = var.create_registry_scanning_resource ? 1 : 0
+  assume_role_policy = jsonencode({
+    "Version" : "2008-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : var.aqua_worker_role_arn
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+  inline_policy {
+    name = "aqua-registry-scanning-policy"
+    policy = jsonencode({
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Action" : [
+            "ecr:GetDownloadUrlForLayer",
+            "ecr:BatchGetImage",
+            "ecr:BatchCheckLayerAvailability",
+            "ecr:PutImage",
+            "ecr:ListImages",
+            "ecr:DescribeImages",
+            "ecr:GetRepositoryPolicy",
+            "ecr:InitiateLayerUpload",
+            "ecr:UploadLayerPart",
+            "ecr:CompleteLayerUpload",
+            "ecr:DescribeRepositories",
+            "ecr:GetAuthorizationToken",
+            "iam:ListRolePolicies",
+            "cloudwatch:GetMetricData",
+            "cloudwatch:ListMetrics"
+          ],
+          "Resource" : "*",
+          "Effect" : "Allow"
+        }
+      ]
+    })
+  }
+  managed_policy_arns = ["arn:aws:iam::aws:policy/SecurityAudit"]
+  name                = var.custom_registry_scanning_role_name == "" ? "aqua-autoconnect-registry-scanning-role-${var.random_id}" : var.custom_registry_scanning_role_name
+}
+
+# Create Serverless Scanning role
+# trivy:ignore:AVD-AWS-0057
+resource "aws_iam_role" "serverless_scanning_role" {
+  count = var.create_serverless_scanning_resource ? 1 : 0
+  assume_role_policy = jsonencode({
+    "Version" : "2008-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : var.aqua_worker_role_arn
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+  inline_policy {
+    name = "aqua-serverless-scanning-policy"
+    policy = jsonencode({
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Action" : [
+            "lambda:ListAliases",
+            "lambda:ListTags",
+            "lambda:GetLayerVersion",
+            "lambda:UntagResource",
+            "lambda:PutFunctionConcurrency",
+            "lambda:TagResource",
+            "lambda:GetFunction",
+            "lambda:UpdateFunctionConfiguration",
+            "lambda:PublishLayerVersion",
+            "lambda:DeleteLayerVersion",
+            "lambda:DeleteFunctionConcurrency",
+            "lambda:GetFunctionUrlConfig",
+            "lambda:GetFunctionCodeSigningConfig",
+            "iam:ListRolePolicies",
+            "cloudwatch:GetMetricData",
+            "cloudwatch:ListMetrics"
+          ],
+          "Resource" : "*",
+          "Effect" : "Allow"
+        }
+      ]
+    })
+  }
+  managed_policy_arns = ["arn:aws:iam::aws:policy/SecurityAudit"]
+  name                = var.custom_serverless_scanning_role_name == "" ? "aqua-autoconnect-serverless-scanning-role-${var.random_id}" : var.custom_serverless_scanning_role_name
+}

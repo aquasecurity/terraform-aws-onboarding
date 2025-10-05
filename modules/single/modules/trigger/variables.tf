@@ -84,3 +84,27 @@ variable "base_cspm" {
   type        = bool
   default     = false
 }
+
+variable "create_registry_scanning_resource" {
+  description = "Create Registry Scanning Resource"
+  type        = bool
+  default     = true
+}
+
+variable "create_serverless_scanning_resource" {
+  description = "Create Serverless Scanning Resource"
+  type        = bool
+  default     = true
+}
+
+variable "registry_scanning_role_arn" {
+  description = "Registry Scanning Role ARN"
+  type        = string
+  default     = ""
+}
+
+variable "serverless_scanning_role_arn" {
+  description = "Serverless Scanning Role ARN"
+  type        = string
+  default     = ""
+}

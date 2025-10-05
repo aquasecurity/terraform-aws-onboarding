@@ -24,3 +24,13 @@ output "agentless_role_arn" {
   description = "The ARN of the IAM role created for the Agentless Volume Scanning"
   value       = try(aws_iam_role.agentless_role[0].arn, "")
 }
+
+output "registry_scanning_role_arn" {
+  description = "The ARN of the IAM role created for Registry Scanning"
+  value       = try(aws_iam_role.registry_scanning_role[0].arn, "")
+}
+
+output "serverless_scanning_role_arn" {
+  description = "The ARN of the IAM role created for Serverless Scanning"
+  value       = try(aws_iam_role.serverless_scanning_role[0].arn, "")
+}

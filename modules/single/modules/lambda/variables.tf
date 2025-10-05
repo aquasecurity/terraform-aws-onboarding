@@ -67,3 +67,27 @@ variable "create_vol_scan_resource" {
   type        = bool
   default     = true
 }
+
+variable "create_registry_scanning_resource" {
+  description = "Create Registry Scanning Resource"
+  type        = bool
+  default     = true
+}
+
+variable "create_serverless_scanning_resource" {
+  description = "Create Serverless Scanning Resource"
+  type        = bool
+  default     = true
+}
+
+variable "custom_registry_scanning_role_name" {
+  description = "Custom Registry Scanning role Name"
+  type        = string
+  default     = ""
+}
+
+variable "custom_serverless_scanning_role_name" {
+  description = "Custom Serverless Scanning role Name"
+  type        = string
+  default     = ""
+}

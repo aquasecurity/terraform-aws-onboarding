@@ -21,6 +21,10 @@ region = query.get('region')
 additional_resource_tags = query.get('additional_tags')
 aws_account_id = query.get('aws_account_id')
 volume_scanning_deployment = query.get('volume_scanning_deployment')
+registry_scanning_deployment = query.get('registry_scanning_deployment')
+serverless_scanning_deployment = query.get('serverless_scanning_deployment')
+registry_scan_role_arn = query.get('registry_scan_role_arn', '')
+serverless_scan_role_arn = query.get('serverless_scan_role_arn', '')
 tstmp = str(int(time.time() * 1000))
 base_cspm = query.get('base_cspm', 'false').lower() == 'true'
 custom_regions = query.get('custom_cspm_regions')
@@ -103,6 +107,8 @@ def trigger_discovery():
         "deployment_method": "Terraform",
         "additional_resource_tags": additional_resource_tags,
         "volume_scanning_deployment": volume_scanning_deployment,
+        "registry_scanning_deployment": registry_scanning_deployment,
+        "serverless_scanning_deployment": serverless_scanning_deployment,
         "base_cspm": base_cspm,
         "cspm_group_id": cspm_group_id,
         "enabled_regions": custom_regions,
@@ -115,6 +121,12 @@ def trigger_discovery():
                 "role_arn": vol_scan_role_arn,
                 "external_id": vol_scan_external_id,
                 "region": region
+            },
+            "registry_scanning": {
+                "role_arn": registry_scan_role_arn
+            },
+            "serverless_scanning": {
+                "role_arn": serverless_scan_role_arn
             }
         }
     })
