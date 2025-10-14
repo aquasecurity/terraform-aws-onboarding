@@ -19,30 +19,36 @@ resource "aws_cloudformation_stack_set" "stack_set" {
   }
 
   parameters = {
-    AquaApiKey                     = sensitive(var.aqua_api_key),
-    AquaSecretKey                  = sensitive(var.aqua_api_secret),
-    AquaGroupName                  = var.aqua_group_name,
-    WorkerRoleArn                  = var.aqua_worker_role_arn,
-    TenantId                       = var.aqua_tenant_id,
-    AquaApiTokenVolScan            = sensitive(var.aqua_volscan_api_token),
-    RandomID                       = var.aqua_random_id,
-    ConfigurationID                = var.aqua_session_id,
-    OrganizationID                 = var.organizational_unit_id,
-    DeployedInfrastructureRegion   = var.region,
-    AdditionalTags                 = join(",", [for key, value in var.additional_tags : "${key}:${value}"])
-    CustomCSPMRoleName             = var.custom_cspm_role_name
-    CustomAgentlessRoleName        = var.custom_agentless_role_name
-    CustomBucketName               = var.custom_bucket_name
-    CustomProcessorLambdaRoleName  = var.custom_processor_lambda_role_name
-    CustomVpcName                  = var.custom_vpc_name
-    CustomVpcSubnet1Name           = var.custom_vpc_subnet1_name
-    CustomVpcSubnetRouteTable1Name = var.custom_vpc_subnet_route_table1_name
-    CustomVpcSubnet2Name           = var.custom_vpc_subnet2_name
-    CustomVpcSubnetRouteTable2Name = var.custom_vpc_subnet_route_table2_name
-    CustomInternetGatewayName      = var.custom_internet_gateway_name
-    CustomSecurityGroupName        = var.custom_security_group_name
-    CustomCSPMRegions              = var.custom_cspm_regions
-    VolumeScanningDeployment       = var.volume_scanning_deployment
+    AquaApiKey                       = sensitive(var.aqua_api_key),
+    AquaSecretKey                    = sensitive(var.aqua_api_secret),
+    AquaGroupName                    = var.aqua_group_name,
+    WorkerRoleArn                    = var.aqua_worker_role_arn,
+    TenantId                         = var.aqua_tenant_id,
+    AquaApiTokenVolScan              = sensitive(var.aqua_volscan_api_token),
+    RandomID                         = var.aqua_random_id,
+    ConfigurationID                  = var.aqua_session_id,
+    OrganizationID                   = var.organizational_unit_id,
+    DeployedInfrastructureRegion     = var.region,
+    AdditionalTags                   = join(",", [for key, value in var.additional_tags : "${key}:${value}"])
+    CustomCSPMRoleName               = var.custom_cspm_role_name
+    CustomAgentlessRoleName          = var.custom_agentless_role_name
+    CustomBucketName                 = var.custom_bucket_name
+    CustomProcessorLambdaRoleName    = var.custom_processor_lambda_role_name
+    CustomVpcName                    = var.custom_vpc_name
+    CustomVpcSubnet1Name             = var.custom_vpc_subnet1_name
+    CustomVpcSubnetRouteTable1Name   = var.custom_vpc_subnet_route_table1_name
+    CustomVpcSubnet2Name             = var.custom_vpc_subnet2_name
+    CustomVpcSubnetRouteTable2Name   = var.custom_vpc_subnet_route_table2_name
+    CustomInternetGatewayName        = var.custom_internet_gateway_name
+    CustomSecurityGroupName          = var.custom_security_group_name
+    CustomCSPMRegions                = var.custom_cspm_regions
+    VolumeScanningDeployment         = var.volume_scanning_deployment
+    BaseCSPM                         = tostring(var.base_cspm)
+    GroupId                          = tostring(var.aqua_cspm_group_id)
+    RegistryScanningDeployment       = var.registry_scanning_deployment
+    ServerlessScanningDeployment     = var.serverless_scanning_deployment
+    CustomRegistryScanningRoleName   = var.custom_registry_scanning_role_name
+    CustomServerlessScanningRoleName = var.custom_serverless_scanning_role_name
   }
 }
 

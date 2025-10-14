@@ -76,7 +76,7 @@ variable "cspm_group_id" {
 variable "custom_cspm_regions" {
   description = "Custom CSPM regions"
   type        = string
-  default = ""
+  default     = ""
 }
 
 variable "base_cspm" {
