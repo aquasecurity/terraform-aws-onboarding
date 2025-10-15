@@ -330,6 +330,7 @@ resource "aws_iam_role" "cspm_role" {
             "devops-guru:ListNotificationChannels",
             "ec2:GetEbsEncryptionByDefault",
             "ec2:GetEbsDefaultKmsKeyId",
+            "ec2:DescribeVpcEndpointServicePermissions",
             "organizations:ListAccounts",
             "kendra:ListIndices",
             "proton:ListEnvironmentTemplates",
