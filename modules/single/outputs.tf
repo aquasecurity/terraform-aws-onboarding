@@ -77,6 +77,16 @@ output "agentless_role_arn" {
   value       = try(module.lambda.agentless_role_arn, null)
 }
 
+output "registry_scanning_role_arn" {
+  description = "The ARN of the IAM role created for Registry Scanning"
+  value       = try(module.lambda.registry_scanning_role_arn, null)
+}
+
+output "serverless_scanning_role_arn" {
+  description = "The ARN of the IAM role created for Serverless Scanning"
+  value       = try(module.lambda.serverless_scanning_role_arn, null)
+}
+
 # Stackset module outputs
 output "stack_set_name" {
   description = "Name of the CloudFormation StackSet"

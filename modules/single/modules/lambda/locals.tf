@@ -2,6 +2,6 @@
 
 locals {
   # Decode the results of Lambda function invocations
-  cspm_external_id       = jsondecode(aws_lambda_invocation.generate_cspm_external_id_function.result)["ExternalId"]
-  volscan_external_id    = try(jsondecode(aws_lambda_invocation.generate_volscan_external_id_function[0].result)["ExternalId"], "")
+  cspm_external_id    = jsondecode(aws_lambda_invocation.generate_cspm_external_id_function.result)["ExternalId"]
+  volscan_external_id = try(jsondecode(aws_lambda_invocation.generate_volscan_external_id_function[0].result)["ExternalId"], "")
 }

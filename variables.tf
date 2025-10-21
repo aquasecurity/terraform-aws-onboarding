@@ -404,10 +404,62 @@ variable "volume_scanning_deployment" {
   description = "Toggle to deploy Volume Scanning resources"
   type        = string
   default     = "true"
+  validation {
+    condition     = var.volume_scanning_deployment == "true" || var.volume_scanning_deployment == "false"
+    error_message = "Volume scanning deployment must be either 'true' or 'false'."
+  }
 }
 
 variable "base_cspm" {
   description = "Toggle for base CSPM only"
   type        = bool
   default     = false
+}
+
+variable "registry_scanning_deployment" {
+  description = "Toggle to deploy Registry/ECR scanning resources"
+  type        = string
+  default     = "true"
+  validation {
+    condition     = var.registry_scanning_deployment == "true" || var.registry_scanning_deployment == "false"
+    error_message = "Registry scanning deployment must be either 'true' or 'false'."
+  }
+}
+
+variable "serverless_scanning_deployment" {
+  description = "Toggle to deploy Serverless/Lambda scanning resources"
+  type        = string
+  default     = "true"
+  validation {
+    condition     = var.serverless_scanning_deployment == "true" || var.serverless_scanning_deployment == "false"
+    error_message = "Serverless scanning deployment must be either 'true' or 'false'."
+  }
+}
+
+variable "custom_registry_scanning_role_name" {
+  description = "Custom Registry Scanning role Name"
+  type        = string
+  default     = ""
+  validation {
+    condition     = length(var.custom_registry_scanning_role_name) == 0 || (length(var.custom_registry_scanning_role_name) >= 1 && length(var.custom_registry_scanning_role_name) <= 64)
+    error_message = "The Registry Scanning IAM role name must be between 1 and 64 characters."
+  }
+  validation {
+    condition     = length(var.custom_registry_scanning_role_name) == 0 || can(regex("[a-zA-Z0-9+=,.@_-]+", var.custom_registry_scanning_role_name))
+    error_message = "The Registry Scanning IAM role name can contain only alphanumeric characters and the following special characters: +=,.@_-"
+  }
+}
+
+variable "custom_serverless_scanning_role_name" {
+  description = "Custom Serverless Scanning role Name"
+  type        = string
+  default     = ""
+  validation {
+    condition     = length(var.custom_serverless_scanning_role_name) == 0 || (length(var.custom_serverless_scanning_role_name) >= 1 && length(var.custom_serverless_scanning_role_name) <= 64)
+    error_message = "The Serverless Scanning IAM role name must be between 1 and 64 characters."
+  }
+  validation {
+    condition     = length(var.custom_serverless_scanning_role_name) == 0 || can(regex("[a-zA-Z0-9+=,.@_-]+", var.custom_serverless_scanning_role_name))
+    error_message = "The Serverless Scanning IAM role name can contain only alphanumeric characters and the following special characters: +=,.@_-"
+  }
 }

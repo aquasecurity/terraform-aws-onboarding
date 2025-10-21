@@ -167,3 +167,27 @@ variable "base_cspm" {
   type        = bool
   default     = false
 }
+
+variable "registry_scanning_deployment" {
+  description = "Toggle to deploy registry/ECR scanning resources"
+  type        = string
+  default     = "true"
+}
+
+variable "serverless_scanning_deployment" {
+  description = "Toggle to deploy serverless/Lambda scanning resources"
+  type        = string
+  default     = "true"
+}
+
+variable "custom_registry_scanning_role_name" {
+  description = "Custom Registry Scanning role Name"
+  type        = string
+  default     = ""
+}
+
+variable "custom_serverless_scanning_role_name" {
+  description = "Custom Serverless Scanning role Name"
+  type        = string
+  default     = ""
+}

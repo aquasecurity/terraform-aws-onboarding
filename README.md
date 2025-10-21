@@ -106,7 +106,9 @@ Before using this module, ensure that you have the following:
 | <a name="input_custom_cspm_role_name"></a> [custom\_cspm\_role\_name](#input\_custom\_cspm\_role\_name) | Custom CSPM role Name | `string` | `""` | no |
 | <a name="input_custom_internet_gateway_name"></a> [custom\_internet\_gateway\_name](#input\_custom\_internet\_gateway\_name) | Custom Internet Gateway Name | `string` | `""` | no |
 | <a name="input_custom_processor_lambda_role_name"></a> [custom\_processor\_lambda\_role\_name](#input\_custom\_processor\_lambda\_role\_name) | Custom Processor lambda role Name | `string` | `""` | no |
+| <a name="input_custom_registry_scanning_role_name"></a> [custom\_registry\_scanning\_role\_name](#input\_custom\_registry\_scanning\_role\_name) | Custom Registry Scanning role Name | `string` | `""` | no |
 | <a name="input_custom_security_group_name"></a> [custom\_security\_group\_name](#input\_custom\_security\_group\_name) | Custom Security Group Name | `string` | `""` | no |
+| <a name="input_custom_serverless_scanning_role_name"></a> [custom\_serverless\_scanning\_role\_name](#input\_custom\_serverless\_scanning\_role\_name) | Custom Serverless Scanning role Name | `string` | `""` | no |
 | <a name="input_custom_vpc_name"></a> [custom\_vpc\_name](#input\_custom\_vpc\_name) | Custom VPC Name | `string` | `""` | no |
 | <a name="input_custom_vpc_subnet1_name"></a> [custom\_vpc\_subnet1\_name](#input\_custom\_vpc\_subnet1\_name) | Custom VPC Subnet 1 Name | `string` | `""` | no |
 | <a name="input_custom_vpc_subnet2_name"></a> [custom\_vpc\_subnet2\_name](#input\_custom\_vpc\_subnet2\_name) | Custom VPC Subnet 2 Name | `string` | `""` | no |
@@ -115,6 +117,8 @@ Before using this module, ensure that you have the following:
 | <a name="input_organizational_unit_id"></a> [organizational\_unit\_id](#input\_organizational\_unit\_id) | AWS Organizational unit (OU) ID to deploy resources on (This should be provided only if type of onboarding is 'organization') | `string` | `""` | no |
 | <a name="input_region"></a> [region](#input\_region) | Main AWS Region to deploy resources | `string` | n/a | yes |
 | <a name="input_regions"></a> [regions](#input\_regions) | AWS Regions to deploy discovery and scanning resources | `list(string)` | n/a | yes |
+| <a name="input_registry_scanning_deployment"></a> [registry\_scanning\_deployment](#input\_registry\_scanning\_deployment) | Toggle to deploy Registry/ECR scanning resources | `string` | `"true"` | no |
+| <a name="input_serverless_scanning_deployment"></a> [serverless\_scanning\_deployment](#input\_serverless\_scanning\_deployment) | Toggle to deploy Serverless/Lambda scanning resources | `string` | `"true"` | no |
 | <a name="input_show_outputs"></a> [show\_outputs](#input\_show\_outputs) | Whether to show outputs after deployment | `bool` | `false` | no |
 | <a name="input_type"></a> [type](#input\_type) | The type of onboarding. Valid values are 'single' or 'organization' onboarding types | `string` | n/a | yes |
 | <a name="input_volume_scanning_deployment"></a> [volume\_scanning\_deployment](#input\_volume\_scanning\_deployment) | Toggle to deploy Volume Scanning resources | `string` | `"true"` | no |
