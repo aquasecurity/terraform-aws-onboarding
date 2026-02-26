@@ -44,14 +44,82 @@ def http_request(url, headers, method, body=None):
     if body is None:
         body = {}
 
+    print(f"HTTP request: {method} {url}")
+
     http = urllib3.PoolManager(cert_reqs='CERT_NONE')
 
     try:
         response = http.request(method, url, body=body, headers=headers)
+        response_data = response.data.decode('utf-8') if response.data else ''
+        print(f"HTTP response: {response.status} {response.reason} - {response_data}")
         return response
     except Exception as e:
         print('Failed to send http request; {}'.format(e))
         return None
+
+
+def get_bearer_token(cspm_base_url, api_key, aqua_secret, tstmp):
+    """Obtain Bearer token from CSPM /v2/tokens endpoint"""
+    path = "/v2/tokens"
+    method = "POST"
+    body = '{"validity":1,"allowed_endpoints":["ANY"]}'
+    tokens_url = cspm_base_url + path
+
+    print("Token fallback: Calling POST /v2/tokens to obtain Bearer token")
+
+    tokens_sig = get_signature(aqua_secret, tstmp, path, method, body)
+    headers = {
+        "X-API-Key": api_key,
+        "X-Signature": tokens_sig,
+        "X-Timestamp": tstmp,
+        "Content-Type": "application/json"
+    }
+
+    response = http_request(tokens_url, headers, method, body)
+    if response is None:
+        raise Exception("Failed to get Bearer token: HTTP request failed")
+
+    if response.status not in [200, 201]:
+        raise Exception(f"Failed to get Bearer token: {response.data.decode('utf-8')}")
+
+    json_object = json.loads(response.data.decode('utf-8'))
+    if json_object.get('status') != 200:
+        error_msg = json_object.get('message', 'Unknown error')
+        raise Exception(f"Tokens API failed: {error_msg}")
+
+    return json_object['data']
+
+
+def cspm_request_with_fallback(cspm_base_url, path, headers, method, body, api_key, aqua_secret, tstmp):
+    """Make CSPM request with automatic token authentication fallback"""
+    url = cspm_base_url + path
+    response = http_request(url, headers, method, body if body else '')
+
+    if response is None:
+        raise ValueError("HTTP request failed")
+
+    # Attempt fallback for 401/403 errors
+    if response.status in [401, 403]:
+        print(f"Token fallback: API key authentication failed with status {response.status}, attempting Bearer token fallback")
+        try:
+            bearer_token = get_bearer_token(cspm_base_url, api_key, aqua_secret, tstmp)
+
+            fallback_headers = {
+                "Authorization": f"Bearer {bearer_token}",
+                "X-Timestamp": tstmp,
+                "Content-Type": "application/json"
+            }
+
+            response = http_request(url, fallback_headers, method, body if body else '')
+            if response and response.status in [200, 201]:
+                print("Token fallback: Bearer token authentication succeeded")
+            elif response:
+                print(f"Token fallback: Bearer token authentication failed with status {response.status}")
+        except Exception as e:
+            print(f"Token fallback failed: {e}")
+            # Return original response if fallback fails
+
+    return response
 
 
 def get_cspm_key_id(aqua_api_key, aqua_secret, cspm_url, role_arn):
@@ -59,7 +127,7 @@ def get_cspm_key_id(aqua_api_key, aqua_secret, cspm_url, role_arn):
     sig = get_signature(aqua_secret, tstmp, "/v2/keys", "GET", '')
     headers = {"X-API-Key": aqua_api_key, "X-Signature": sig, "X-Timestamp": tstmp}
 
-    response = http_request(cspm_url + "/v2/keys", headers, "GET")
+    response = cspm_request_with_fallback(cspm_url, "/v2/keys", headers, "GET", '', aqua_api_key, aqua_secret, tstmp)
     json_object = json.loads(response.data)
     if response.status not in (200, 201):
         raise ValueError(f"Failed to get cspm key id for {role_arn}: {response.message}")
@@ -93,7 +161,7 @@ def create_cspm_key(cspm_url, aqua_api_key, aqua_secret, role_arn, external_id, 
         "X-Timestamp": tstmp
     }
 
-    response = http_request(cspm_url + '/v2/keys', headers, "POST", jsonbody)
+    response = cspm_request_with_fallback(cspm_url, '/v2/keys', headers, "POST", jsonbody, aqua_api_key, aqua_secret, tstmp)
     if response.status not in (200, 201):
         raise Exception("Failed to create cspm key id", response.data.decode("utf-8"))
 

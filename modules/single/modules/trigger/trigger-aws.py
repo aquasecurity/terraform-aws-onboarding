@@ -6,6 +6,12 @@ import hashlib
 import http.client
 import ssl
 
+
+def log(message):
+    """Log message to stderr (for Terraform external data source compatibility)"""
+    print(message, file=sys.stderr)
+
+
 query = json.loads(sys.stdin.read())
 ac_url = query.get('autoconnect_url')
 cspm_url = query.get('cspm_url')
@@ -53,6 +59,8 @@ def http_request(url, headers, method, body=None):
     else:
         raise ValueError("Unsupported URL format")
 
+    log(f"HTTP request: {method} {url}")
+
     try:
         conn = http.client.HTTPSConnection(hostname, context=ssl._create_unverified_context())
         conn.request(method, path, body=body, headers=headers)
@@ -62,14 +70,80 @@ def http_request(url, headers, method, body=None):
 
         conn.close()
 
+        log(f"HTTP response: {response.status} {response.reason} - {response_data}")
+
         return {
             "status": response.status,
             "reason": response.reason,
             "data": response_data
         }
     except Exception as e:
-        print(f"Failed to send HTTP request: {e}")
+        log(f"Failed to send HTTP request: {e}")
         return None
+
+
+def get_bearer_token(cspm_base_url, api_key, aqua_secret, tstmp):
+    """Obtain Bearer token from CSPM /v2/tokens endpoint"""
+    path = "/v2/tokens"
+    method = "POST"
+    body = '{"validity":1,"allowed_endpoints":["ANY"]}'
+    tokens_url = cspm_base_url + path
+
+    log("Token fallback: Calling POST /v2/tokens to obtain Bearer token")
+
+    tokens_sig = get_signature(aqua_secret, tstmp, path, method, body)
+    headers = {
+        "X-API-Key": api_key,
+        "X-Signature": tokens_sig,
+        "X-Timestamp": tstmp,
+        "Content-Type": "application/json"
+    }
+
+    response = http_request(tokens_url, headers, method, body)
+    if response is None:
+        raise Exception("Failed to get Bearer token: HTTP request failed")
+
+    if response["status"] not in [200, 201]:
+        raise Exception(f"Failed to get Bearer token: {response['data']}")
+
+    json_object = json.loads(response["data"].strip())
+    if json_object.get('status') != 200:
+        error_msg = json_object.get('message', 'Unknown error')
+        raise Exception(f"Tokens API failed: {error_msg}")
+
+    return json_object['data']
+
+
+def cspm_request_with_fallback(cspm_base_url, path, headers, method, body, api_key, aqua_secret, tstmp):
+    """Make CSPM request with automatic token authentication fallback"""
+    url = cspm_base_url + path
+    response = http_request(url, headers, method, body)
+
+    if response is None:
+        raise ValueError("HTTP request failed")
+
+    # Attempt fallback for 401/403 errors
+    if response["status"] in [401, 403]:
+        log(f"Token fallback: API key authentication failed with status {response['status']}, attempting Bearer token fallback")
+        try:
+            bearer_token = get_bearer_token(cspm_base_url, api_key, aqua_secret, tstmp)
+            
+            fallback_headers = {
+                "Authorization": f"Bearer {bearer_token}",
+                "X-Timestamp": tstmp,
+                "Content-Type": "application/json"
+            }
+            
+            response = http_request(url, fallback_headers, method, body)
+            if response["status"] in [200, 201]:
+                log("Token fallback: Bearer token authentication succeeded")
+            else:
+                log(f"Token fallback: Bearer token authentication failed with status {response['status']}")
+        except Exception as e:
+            log(f"Token fallback failed: {e}")
+            # Return original response if fallback fails
+
+    return response
 
 
 def get_cspm_key_id(aqua_api_key, aqua_secret, cspm_url, role_arn):
@@ -82,7 +156,7 @@ def get_cspm_key_id(aqua_api_key, aqua_secret, cspm_url, role_arn):
         "X-Timestamp": tstmp
     }
 
-    response = http_request(cspm_url + "/v2/keys", headers, "GET")
+    response = cspm_request_with_fallback(cspm_url, "/v2/keys", headers, "GET", '', aqua_api_key, aqua_secret, tstmp)
 
     if response is None:
         raise ValueError(f"HTTP request failed while getting CSPM key ID for {role_arn}")
@@ -90,7 +164,7 @@ def get_cspm_key_id(aqua_api_key, aqua_secret, cspm_url, role_arn):
     if response["status"] not in [200, 201]:
         raise ValueError(f"Failed to get CSPM key ID: {response['data']}")
 
-    json_object = json.loads(response["data"])
+    json_object = json.loads(response["data"].strip())
     for key in json_object['data']:
         if key['role_arn'] == role_arn:
             return key['id']
@@ -142,10 +216,12 @@ def trigger_discovery():
         )
 
     cspm_sig = get_signature(aqua_secret, tstmp, "/v2/keys", "POST", body_cspm)
+    tokens_signature = get_signature(aqua_secret, tstmp, "/v2/tokens", "POST", '{"validity":1,"allowed_endpoints":["ANY"]}')
     headers = {
         "X-API-Key": aqua_api_key,
         "X-Authenticate-Api-Key-Signature": sig,
         "X-Register-New-Cspm-Signature": cspm_sig,
+        "X-Tokens-Signature": tokens_signature,
         "X-Timestamp": tstmp
     }
 
@@ -169,7 +245,7 @@ def update_credentials():
 
     cspm_headers = {"X-API-Key": aqua_api_key, "X-Signature": cspm_sig, "X-Timestamp": tstmp}
 
-    cspm_response = http_request(cspm_url + f"/v2/keys/{cspm_key_id}", cspm_headers, "PUT", cspm_body)
+    cspm_response = cspm_request_with_fallback(cspm_url, f"/v2/keys/{cspm_key_id}", cspm_headers, "PUT", cspm_body, aqua_api_key, aqua_secret, tstmp)
 
     ac_body = json.dumps({
         "cloud_account_id": aws_account_id,
@@ -182,8 +258,9 @@ def update_credentials():
     })
 
     ac_sig = get_signature(aqua_secret, tstmp, "/v2/internal_apikeys", method="GET")
+    tokens_signature = get_signature(aqua_secret, tstmp, "/v2/tokens", "POST", '{"validity":1,"allowed_endpoints":["ANY"]}')
 
-    ac_headers = {"X-API-Key": aqua_api_key, "X-Authenticate-Api-Key-Signature": ac_sig, "X-Timestamp": tstmp}
+    ac_headers = {"X-API-Key": aqua_api_key, "X-Authenticate-Api-Key-Signature": ac_sig, "X-Tokens-Signature": tokens_signature, "X-Timestamp": tstmp}
 
     ac_response = http_request(ac_url + f"/discover/update-credentials/{cloud}", ac_headers, "PUT", ac_body)
 
@@ -194,12 +271,13 @@ def update_credentials():
 
 
 def main():
+    discovery_response = None
     try:
         discovery_response = trigger_discovery()
-        discovery_data = json.loads(discovery_response.get("data", "{}"))
+        discovery_data = json.loads(discovery_response.get("data", "{}").strip())
         if discovery_data.get("state") == "discover_in_progress":
             update_credentials_response = update_credentials()
-            update_credentials_data = json.loads(update_credentials_response.get("data", "{}"))
+            update_credentials_data = json.loads(update_credentials_response.get("data", "{}").strip())
 
             if update_credentials_response and update_credentials_response.get('status') == 200:
                 onboarding_status = f"received response: discovery status {discovery_response.get('status', 'Unknown')}, body: {discovery_data}"
@@ -209,7 +287,7 @@ def main():
             onboarding_status = f"received response: discovery status {discovery_response.get('status', 'Unknown')}, body: {discovery_data}"
 
     except Exception as e:
-        onboarding_status = f"received response: status Error, body: {str(e)}"
+        onboarding_status = f"received response: status Error, body: {str(e)}, raw discovery_response: {discovery_response}"
 
     output = {
         "status": onboarding_status
