@@ -227,6 +227,9 @@ def update_credentials():
 
     cspm_status, cspm_data = cspm_request_with_fallback(cspm_url, f"/v2/keys/{cspm_key_id}", cspm_headers, "PUT", cspm_body, aqua_api_key, aqua_secret, tstmp)
 
+    if cspm_status not in [200, 201]:
+        raise ValueError(f"Failed to update CSPM credentials (key {cspm_key_id}): {cspm_data}")
+
     ac_body = json.dumps({
         "cloud_account_id": aws_account_id,
         "credentials": {
@@ -243,6 +246,10 @@ def update_credentials():
     ac_headers = {"X-API-Key": aqua_api_key, "X-Authenticate-Api-Key-Signature": ac_sig, "X-Tokens-Signature": tokens_signature, "X-Timestamp": tstmp}
 
     ac_status, ac_data = http_request(ac_url + f"/discover/update-credentials/{cloud}", ac_headers, "PUT", ac_body)
+
+    if ac_status not in [200, 201]:
+        raise ValueError(f"Failed to update autoconnect credentials: {ac_data}")
+
     return {"status": cspm_status, "data": cspm_data}
 
 
