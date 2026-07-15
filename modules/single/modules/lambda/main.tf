@@ -349,6 +349,7 @@ resource "aws_iam_role" "cspm_role" {
             "healthlake:ListFHIRDatastores",
             "codeartifact:ListDomains",
             "auditmanager:GetSettings",
+            "macie2:GetAutomatedDiscoveryConfiguration",
             "appflow:ListFlows",
             "databrew:ListJobs",
             "managedblockchain:ListNetworks",
