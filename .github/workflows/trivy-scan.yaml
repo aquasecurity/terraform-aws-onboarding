@@ -2,7 +2,7 @@ name: Trivy
 on: pull_request
 jobs:
   aqua:
-    name: Aqua scanner
+    name: Trivy scanner
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -10,18 +10,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE}}
-          GITLEAKS_ENABLE_COMMENTS: false
+      - name: Install gitleaks
+        run: |
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz" | tar -xz
+          sudo mv gitleaks /usr/local/bin/gitleaks
 
-      - name: Run Aqua scanner
-        uses: docker://aquasec/aqua-scanner
+      - name: Run gitleaks
+        run: |
+          gitleaks detect \
+            --source . \
+            --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" \
+            --verbose \
+            --redact
+
+      - name: Run Trivy scanner
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
-          args: trivy fs --scanners misconfig,secret .
-        env:
-          AQUA_KEY: ${{ secrets.AQUA_KEY }}
-          AQUA_SECRET: ${{ secrets.AQUA_SECRET }}
-          GITHUB_TOKEN: ${{ github.token }}
-          TRIVY_RUN_AS_PLUGIN: 'aqua'
+          scan-type: fs
+          scan-ref: .
+          scanners: misconfig,secret
+          hide-progress: true
+          format: table
+          exit-code: 1
