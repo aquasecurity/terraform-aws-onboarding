@@ -74,6 +74,7 @@ jobs:
 
       - name: Comment PR with Terraform status
         if: always()
+        continue-on-error: true
         uses: actions/github-script@v7
         env:
           FORMAT_CHECK: ${{ steps.terraform-checks.outputs.format_check == 'true' && '✅' || '❌' }}

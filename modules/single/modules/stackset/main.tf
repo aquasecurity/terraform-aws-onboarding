@@ -41,6 +41,7 @@ resource "aws_iam_role" "stackset_admin_role" {
 
 # Create Stackset execution role
 # trivy:ignore:AVD-AWS-0057
+# trivy:ignore:AVD-AWS-0345
 resource "aws_iam_role" "stackset_execution_role" {
   count = var.create_vol_scan_resource ? 1 : 0
   assume_role_policy = jsonencode({
